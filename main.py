@@ -3,8 +3,7 @@ from pathlib import Path
 
 
 def main():
-    filename = str(Path.joinpath(Path.cwd(), 'service_account.json'))
-    gc = gspread.service_account(filename=filename)
+    gc = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
     sh = gc.open('smm-planer-table')
 
     print(sh.sheet1.get('A1'))
