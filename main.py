@@ -25,8 +25,16 @@ def main():
     gc = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
     sh = gc.open('smm-planer-table')
 
-    post = sh.sheet1.get('A2')[0][0]
-    print(post)
+    titles = sh.sheet1.row_values(1)
+    row = sh.sheet1.row_values(5)
+    post = {}
+    for index, title in enumerate(titles):
+        try:
+            if row[index] == '':
+                row[index] = None
+            post[title] = row[index]
+        except IndexError:
+            post[title] = None
     send_post(telegram_bot_token, telegram_chat_id, post)
 
 
