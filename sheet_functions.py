@@ -20,6 +20,7 @@ def main():
     # get_posts_count()
     # get_all_records()
     format_cell(1, 1, BLACK, GREEN)
+    WORKSHEET.update_cell(5, 4, 'проба')  # post some text
 
 
 def format_date(str_date):
