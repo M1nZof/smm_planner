@@ -1,4 +1,7 @@
 import gspread
+
+
+from gspread import utils
 from pathlib import Path
 from datetime import datetime
 
@@ -6,12 +9,17 @@ from datetime import datetime
 GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
+BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
+WHITE = {'red': 1.0, 'green': 1.0, 'blue': 1.0}
+GREEN = {'red': 0.0, 'green': 1.0, 'blue': 0.0}
+RED = {'red': 1.0, 'green': 0.0, 'blue': 0.0}
 
 
 def main():
     # print(get_all_posts())
     # get_posts_count()
-    get_all_records()
+    # get_all_records()
+    format_cell(1, 1, BLACK, GREEN)
 
 
 def format_date(str_date):
@@ -50,8 +58,18 @@ def get_posts_count():
     print(posts_count)
 
 
-def post_cell_text(col, row, text=''):
+def post_cell_text(row, col, text=''):
+    WORKSHEET.update_cell(row, col, text)
     pass
+
+
+def format_cell(row, col, b_color, f_color):
+    WORKSHEET.format(utils.rowcol_to_a1(row, col), {
+        "backgroundColor": b_color,
+        "textFormat": {
+            "foregroundColor": f_color,
+        }
+    })
 
 
 if __name__ == '__main__':
