@@ -1,0 +1,8 @@
+# Пример файла .env для ОДНОКЛАССНИКОВ
+
+```
+OK_APPLICATION_ID='5120013570.'
+OK_SECRET_KEY='2C3003B0901C435C8EC82C.'
+OK_PUBLIC_KEY='CDFENQKIHBABABA.'
+OK_URL='https://ok.ru/game/512001823570'
+```
