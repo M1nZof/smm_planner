@@ -10,7 +10,8 @@ WORKSHEET = SPREADSHEET.sheet1
 
 def main():
     # print(get_all_posts())
-    get_posts_count()
+    # get_posts_count()
+    get_all_records()
 
 
 def format_date(str_date):
@@ -31,6 +32,11 @@ def get_all_posts():
     return all_posts
 
 
+def get_all_records():
+    all_records = WORKSHEET.get_all_records()
+    return all_records
+
+
 def get_all_times():
     for time in sorted(WORKSHEET.col_values(4)):
         if '-' not in time:
@@ -42,6 +48,10 @@ def get_all_times():
 def get_posts_count():
     posts_count = len(WORKSHEET.col_values(1)) - 1
     print(posts_count)
+
+
+def post_cell_text(col, row, text=''):
+    pass
 
 
 if __name__ == '__main__':
