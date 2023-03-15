@@ -1,14 +1,38 @@
+import gdown
 import gspread
 import telegram
+import json
 
-
+from bs4 import BeautifulSoup
 from pathlib import Path
 from environs import Env
+from urllib.parse import urlparse
 
 
 def send_post(telegram_bot_token, telegram_chat_id, post):
     bot = telegram.Bot(token=telegram_bot_token)
-    bot.send_message(telegram_chat_id, post)
+    output = str(urlparse(post['link_google_document']).path.split('/')[-2])
+    gdown.download(url=post['link_google_document'], output=output, fuzzy=True, quiet=True)
+    with open(output, 'r', encoding='UTF-8') as file:
+        soup = BeautifulSoup(file, 'html.parser')
+        scripts = soup.find_all({'script': 'nonce'})
+        text = ''
+        for script in scripts:
+            if script.text.startswith('DOCS_modelChunk ='):
+                text = script.text.replace('DOCS_modelChunk = ', '')
+                excess_text_part_char = text.find('; DOCS_modelChunkLoadStart')
+                text = text[:excess_text_part_char]
+                text = json.loads(text)[0]['s']
+                break
+
+    if post.get('photo_url') is None:
+        bot.send_message(telegram_chat_id, text)
+    else:
+        if len(text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
+            bot.send_photo(telegram_chat_id, post['photo_url'], text)
+        else:
+            bot.send_photo(telegram_chat_id, post['photo_url'])
+            bot.send_message(telegram_chat_id, text)
 
 
 def main():
