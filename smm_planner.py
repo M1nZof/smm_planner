@@ -16,20 +16,26 @@ def main():
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
         for post_number, post in enumerate(all_new_posts):
-            post_text, image_file_name = get_posts_text_imagefile(post)
-            if post['social_network'] == 'Telegram':
-                send_telegram_post(post)
-            elif post['social_network'] == 'VK':
-                publication_post_vk(post_text, image_file_name)
-            elif post['social_network'] == 'OK':
-                publication_post_ok(post_text, image_file_name)
+            formatted_datetime = sheet_functions.get_formatted_datetime(post)
+            datetime_now = sheet_functions.get_datetime_now()
+            if formatted_datetime <= datetime_now:
+                post_text, image_file_name = get_posts_text_imagefile(post)
+                if post['social_network'] == 'Telegram':
+                    send_telegram_post(post)
+                elif post['social_network'] == 'VK':
+                    publication_post_vk(post_text, image_file_name)
+                elif post['social_network'] == 'OK':
+                    publication_post_ok(post_text, image_file_name)
 
-            cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
-            sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
-            time.sleep(3)
+                cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
+                sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
+                time.sleep(3)
 
-            Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
-            Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
+                Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
+                Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
+
+        time.sleep(30)  # ограничение запроса к Гуглу, иначе блокирует доступ
+# https://stackoverflow.com/questions/65153922/why-am-i-receiving-a-quota-limit-error-google-cloud-platform-compute-engine-vm
 
 
 def get_posts_text_imagefile(post):
