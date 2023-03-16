@@ -1,9 +1,15 @@
 import telegram
 
+
 from google_handlers.google_document_functions import collecting_google_document
+from environs import Env
 
 
-def send_telegram_post(telegram_bot_token, telegram_chat_id, post):
+def send_telegram_post(post):
+    env = Env()
+    env.read_env()
+    telegram_bot_token = env('TELEGRAM_BOT_TOKEN')
+    telegram_chat_id = env('TELEGRAM_CHAT_ID')
     bot = telegram.Bot(token=telegram_bot_token)
     link_google_document = post['link_google_document']
     text = collecting_google_document(link_google_document)
