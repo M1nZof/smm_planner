@@ -19,10 +19,22 @@ def publication_post_ok(post_text, image_file_name):
 
     for photo_id in upload_response['photos']:
         token = upload_response['photos'][photo_id]['token']
-        response = ok.photosV2.commit(photo_id=photo_id, token=token)
+        response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
         print(response.json())
 
     print(ok.friends.get())
 
     response = ok.friends.get(sort_type='PRESENT')
     print(response.json())
+
+
+def main():
+    post_text = 'Какая то бабуйня в космосе'
+    image_file_name = '2.jpg'
+
+    publication_post_ok(post_text, image_file_name)
+
+
+
+if __name__ == '__main__':
+    main()
