@@ -1,3 +1,4 @@
+import time
 from urllib import parse
 
 import requests
@@ -7,29 +8,36 @@ from google_handlers import sheet_functions
 from pathlib import Path
 from environs import Env
 
-from social_networks_handlers import vk_publication, ok_publication, tg_publication
+from social_networks_handlers.ok_publication import publication_post_ok
+from social_networks_handlers.tg_publication import send_telegram_post
+from social_networks_handlers.vk_publication import publication_post_vk
 
 
 def main():
     env = Env()
     env.read_env()
 
-    # всего постов
-    posts_count = sheet_functions.get_posts_count()
+    telegram_bot_token = env('TELEGRAM_BOT_TOKEN')
+    telegram_chat_id = env('TELEGRAM_CHAT_ID')
 
-    all_new_posts = sheet_functions.get_all_new_posts()
-    for post in all_new_posts:
-        # получаем текст поста и имя файла картинки
-        post_text, image_file_name = get_posts_text_imagefile(post)
+    while True:
+        all_posts = sheet_functions.get_all_records()
 
-        # публикуем пост Вконтаке
-        vk_publication.publication_post_vk(post_text, image_file_name)
+        for post_number, post in enumerate(all_posts, start=2):
+            formatted_datetime = sheet_functions.get_formatted_datetime(post)
+            datetime_now = sheet_functions.get_datetime_now()
 
-        # публикуем пост в Одноклассниках
-        ok_publication.publication_post_ok(post_text, image_file_name)
+            if formatted_datetime <= datetime_now and post['public_fact'] == '': # TODO убрать проверку факта публикации
+                post_text, image_file_name = get_posts_text_imagefile(post_number)
+                if post['social_network'] == 'Telegram':
+                    send_telegram_post(telegram_bot_token, telegram_chat_id, post)
+                elif post['social_network'] == 'VK':
+                    publication_post_vk(post_text, image_file_name)
+                elif post['social_network'] == 'OK':
+                    publication_post_ok(post_text, image_file_name)
 
-        # публикуем пост в Telegram
-        # tg_publication.send_telegram_post(telegram_bot_token, telegram_chat_id, post_text, image_file_name)
+                sheet_functions.post_cell_text(post_number, 7, str(datetime_now))
+                time.sleep(300)
 
 
         Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
