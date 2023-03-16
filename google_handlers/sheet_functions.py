@@ -7,23 +7,13 @@ from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), '../service_account.json').__str__())
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd().parent, 'ENV', 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
 WHITE = {'red': 1.0, 'green': 1.0, 'blue': 1.0}
 GREEN = {'red': 0.0, 'green': 1.0, 'blue': 0.0}
 RED = {'red': 1.0, 'green': 0.0, 'blue': 0.0}
-
-
-def main():
-    # примеры сделанных функций
-    # print(get_all_posts())
-    # get_posts_count()
-    # get_all_records()
-    # format_cell(1, 1, BLACK, GREEN)
-    # WORKSHEET.update_cell(5, 4, 'проба')  # post some text
-    pass
 
 
 def format_date(str_date):
@@ -58,12 +48,13 @@ def get_datetime_now():
                     datetime_now.minute)
 
 
-def get_all_posts():
-    all_values = WORKSHEET.get_all_values()
-    all_posts = []
-    for post in all_values[1:]:
-        all_posts.append(dict(zip(all_values[0], post)))
-    return all_posts
+def get_all_new_posts():
+    all_posts = WORKSHEET.get_all_records()
+    all_new_posts = []
+    for post in all_posts:
+        if not post['public_fact']:
+            all_new_posts.append(post)
+    return all_new_posts
 
 
 def get_all_records():
@@ -109,11 +100,4 @@ def get_post_text(post):
                 excess_text_part_char = text.find('; DOCS_modelChunkLoadStart')
                 text = text[:excess_text_part_char]
                 text = json.loads(text)[0]['s']
-    try:
-        Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
-    finally:
-        return text
-
-
-if __name__ == '__main__':
-    main()
+    return text

@@ -86,11 +86,9 @@ def publication_post_vk(post_text, image_file_name):
             break
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка сети.\nОшибка {error}')
+            return False
         except requests.exceptions.ConnectionError as error:
             print(f'Ошибка соединения сети.\nОшибка {error}')
             time.sleep(1)
             continue
-
-        # удаляем временный файл с изображением
-        finally:
-            Path(Path.joinpath(file_path, image_file_name)).unlink()  # удаляем файл изображения
+    return True
