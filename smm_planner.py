@@ -6,7 +6,6 @@ import requests
 from google_handlers import sheet_functions
 
 from pathlib import Path
-from environs import Env
 
 from social_networks_handlers.ok_publication import publication_post_ok
 from social_networks_handlers.tg_publication import send_telegram_post
@@ -18,50 +17,26 @@ def main():
     env.read_env()
 
     while True:
-        all_posts = sheet_functions.get_all_records()
+        all_new_posts = sheet_functions.get_all_new_posts()
+        for post_number, post in enumerate(all_new_posts):
+            post_text, image_file_name = get_posts_text_imagefile(post)
+            if post['social_network'] == 'Telegram':
+                send_telegram_post(post_text, image_file_name)
+            elif post['social_network'] == 'VK':
+                publication_post_vk(post_text, image_file_name)
+            elif post['social_network'] == 'OK':
+                publication_post_ok(post_text, image_file_name)
 
-        for post_number, post in enumerate(all_posts, start=2):
-            formatted_datetime = sheet_functions.get_formatted_datetime(post)
-            datetime_now = sheet_functions.get_datetime_now()
+            cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
+            sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
+            time.sleep(3)
 
-            if formatted_datetime <= datetime_now and post['public_fact'] == '': # TODO убрать проверку факта публикации
-                post_text, image_file_name = get_posts_text_imagefile(post_number)
-                if post['social_network'] == 'Telegram':
-                    send_telegram_post(post_text, image_file_name)
-                elif post['social_network'] == 'VK':
-                    publication_post_vk(post_text, image_file_name)
-                elif post['social_network'] == 'OK':
-                    publication_post_ok(post_text, image_file_name)
-
-                sheet_functions.post_cell_text(post_number, 7, str(datetime_now))
-                time.sleep(300)
-
-    # # всего постов
-    # posts_count = sheet_functions.get_posts_count()
-    #
-    # # задаем номер публикуемого поста
-    # post_number = 5
-    #
-    # # проверяем на верность
-    # if post_number > posts_count:
-    #     print(f'{post_number} - неверный номер поста')
-    #     exit()
-    #
-    # # получаем текст поста и имя файла картинки
-    # post_text, image_file_name = get_posts_text_imagefile(post_number)
-    #
-    # # публикуем пост Вконтаке
-    # vk_publication.publication_post_vk(post_text, image_file_name)
-    #
-    # # публикуем пост в Одноклассниках
-    # ok_publication.publication_post_ok(post_text, image_file_name)
+            Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
+            Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
 
 
-def get_posts_text_imagefile(post_number):
-    all_posts = sheet_functions.get_all_records()
-    post = all_posts[post_number - 1]
+def get_posts_text_imagefile(post):
     image_file_name = Path(parse.urlsplit(post['photo_url']).path).name
-
     post_image = requests.get(post['photo_url'])
     post_image.raise_for_status()
 
