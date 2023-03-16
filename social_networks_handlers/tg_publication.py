@@ -1,6 +1,6 @@
 import telegram
 
-from google_document_handlers import collecting_google_document
+from google_handlers.google_document_functions import collecting_google_document
 
 
 def send_telegram_post(telegram_bot_token, telegram_chat_id, post):

@@ -3,13 +3,12 @@ from urllib import parse
 import gspread
 import requests
 
-import sheet_functions
+from google_handlers import sheet_functions
 
 from pathlib import Path
 from environs import Env
 
-import vk_publication
-import ok_publication
+from social_networks_handlers import vk_publication, ok_publication
 
 GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
