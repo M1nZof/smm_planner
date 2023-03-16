@@ -1,9 +1,10 @@
 import requests
-from urllib import parse
+import time
+
+
 from urllib.error import HTTPError
 from pathlib import Path
 from environs import Env
-from random import randint
 
 
 def check_vk_request_error(response):
@@ -66,23 +67,6 @@ def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     check_vk_request_error(response)
 
 
-def get_random_post():
-    last_post = requests.get(f'{POST_LINK}/info.0.json')
-    last_post.raise_for_status()
-    last_post_id = last_post.json()['num']
-
-    random_post_id = randint(1, last_post_id)
-
-    post_parameters = requests.get(f'{POST_LINK}{str(random_post_id)}/info.0.json')
-    post_parameters.raise_for_status()
-    post_parameters = post_parameters.json()
-
-    post = requests.get(post_parameters['img'])
-    post.raise_for_status()
-
-    return post_parameters, post, random_post_id
-
-
 def main():
     env = Env()
     env.read_env()
@@ -93,20 +77,27 @@ def main():
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
 
-    post_parameters, post, random_post_id = get_random_post()
-    post_file_name = Path(parse.urlsplit(post_parameters['img']).path).name
+    # эти данные надо брать из скрипта сохранения данных из гугл шита + гугл докс
+    post_file_name = '1.jpg'
+    post_text = 'проба1234'
 
-    try:
-        with open(Path.joinpath(file_path, post_file_name), 'wb') as file:
-            file.write(post.content)
-        print(f'Публикуем комикс № {random_post_id}')
-        album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
-        photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url, file_path, post_file_name)
-        post_wall_photo(vk_authorization, vk_group_id, post_parameters['alt'], photo_owner_id, photo_id)
-    except requests.exceptions.HTTPError as error:
-        print(f'Ошибка сети.\nОшибка {error}')
-    finally:
-        Path(Path.joinpath(file_path, post_file_name)).unlink()
+    while True:
+        try:
+            album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
+            photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
+                                                          file_path, post_file_name)
+            post_wall_photo(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
+            break
+        except requests.exceptions.HTTPError as error:
+            print(f'Ошибка сети.\nОшибка {error}')
+        except requests.exceptions.ConnectionError as error:
+            print(f'Ошибка соединения сети.\nОшибка {error}')
+            time.sleep(1)
+            continue
+
+        # удаляем временный файл с изображением?
+        # finally:
+        #     Path(Path.joinpath(file_path, post_file_name)).unlink()
 
 
 if __name__ == "__main__":
