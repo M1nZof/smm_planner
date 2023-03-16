@@ -1,7 +1,6 @@
 import time
 from urllib import parse
 
-import gspread
 import requests
 
 from google_handlers import sheet_functions
@@ -9,14 +8,9 @@ from google_handlers import sheet_functions
 from pathlib import Path
 from environs import Env
 
-from social_networks_handlers import vk_publication, ok_publication
 from social_networks_handlers.ok_publication import publication_post_ok
 from social_networks_handlers.tg_publication import send_telegram_post
 from social_networks_handlers.vk_publication import publication_post_vk
-
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
-SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
-WORKSHEET = SPREADSHEET.sheet1
 
 
 def main():
@@ -33,7 +27,7 @@ def main():
             formatted_datetime = sheet_functions.get_formatted_datetime(post)
             datetime_now = sheet_functions.get_datetime_now()
 
-            if formatted_datetime <= datetime_now and post['public_fact'] != '': # TODO убрать проверку факта публикации
+            if formatted_datetime <= datetime_now and post['public_fact'] == '': # TODO убрать проверку факта публикации
                 post_text, image_file_name = get_posts_text_imagefile(post_number)
                 if post['social_network'] == 'Telegram':
                     send_telegram_post(telegram_bot_token, telegram_chat_id, post)
@@ -41,7 +35,8 @@ def main():
                     publication_post_vk(post_text, image_file_name)
                 elif post['social_network'] == 'OK':
                     publication_post_ok(post_text, image_file_name)
-                sheet_functions.post_cell_text(post_number, 7, datetime_now)
+
+                sheet_functions.post_cell_text(post_number, 7, str(datetime_now))
                 time.sleep(300)
 
     # # всего постов

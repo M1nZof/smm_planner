@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), '../service_account.json').__str__())
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
