@@ -1,18 +1,22 @@
 import telegram
+from environs import Env
 
-from google_handlers.google_document_functions import collecting_google_document
 
+def send_telegram_post(post_text, image_name):
+    env = Env()
+    env.read_env()
 
-def send_telegram_post(telegram_bot_token, telegram_chat_id, post):
+    telegram_bot_token = env('TELEGRAM_BOT_TOKEN')
+    telegram_chat_id = env('TELEGRAM_CHAT_ID')
+
     bot = telegram.Bot(token=telegram_bot_token)
-    link_google_document = post['link_google_document']
-    text = collecting_google_document(link_google_document)
 
-    if post.get('photo_url') is None:
-        bot.send_message(telegram_chat_id, text)
+    if image_name is None:
+        bot.send_message(telegram_chat_id, post_text)
     else:
-        if len(text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
-            bot.send_photo(telegram_chat_id, post['photo_url'], text)
-        else:
-            bot.send_photo(telegram_chat_id, post['photo_url'])
-            bot.send_message(telegram_chat_id, text)
+        with open(image_name, 'rb') as image:
+            if len(post_text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
+                bot.send_photo(telegram_chat_id, image, post_text)
+            else:
+                bot.send_photo(telegram_chat_id, image)
+                bot.send_message(telegram_chat_id, post_text)

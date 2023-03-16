@@ -17,9 +17,6 @@ def main():
     env = Env()
     env.read_env()
 
-    telegram_bot_token = env('TELEGRAM_BOT_TOKEN')
-    telegram_chat_id = env('TELEGRAM_CHAT_ID')
-
     while True:
         all_posts = sheet_functions.get_all_records()
 
@@ -30,7 +27,7 @@ def main():
             if formatted_datetime <= datetime_now and post['public_fact'] == '': # TODO убрать проверку факта публикации
                 post_text, image_file_name = get_posts_text_imagefile(post_number)
                 if post['social_network'] == 'Telegram':
-                    send_telegram_post(telegram_bot_token, telegram_chat_id, post)
+                    send_telegram_post(post_text, image_file_name)
                 elif post['social_network'] == 'VK':
                     publication_post_vk(post_text, image_file_name)
                 elif post['social_network'] == 'OK':
@@ -65,9 +62,6 @@ def get_posts_text_imagefile(post_number):
     post = all_posts[post_number - 1]
     image_file_name = Path(parse.urlsplit(post['photo_url']).path).name
 
-    all_posts = sheet_functions.get_all_posts()
-
-    # send_telegram_post(telegram_bot_token, telegram_chat_id, post)
     post_image = requests.get(post['photo_url'])
     post_image.raise_for_status()
 
