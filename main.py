@@ -8,6 +8,7 @@ from urllib import parse
 
 
 import vk_publication
+import ok_publication
 
 
 def main():
@@ -30,6 +31,9 @@ def main():
 
     # публикуем пост Вконтаке
     vk_publication.publication_post_vk(post_text, image_file_name)
+
+    # публикуем пост в Одноклассниках
+    ok_publication.publication_post_ok(post_text, image_file_name)
 
 
 def get_posts_text_imagefile(post_number):

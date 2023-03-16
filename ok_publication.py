@@ -3,20 +3,19 @@ from ok_api import OkApi, Upload
 from dotenv import load_dotenv
 
 
-def main():
+def publication_post_ok(post_text, image_file_name):
     load_dotenv()
-
     access_token = os.environ["OK_ACCESS_TOKEN"]
     application_key = os.environ["OK_APPLICATION_KEY"]
     application_secret_key = os.environ["OK_SECRET_KEY"]
-
+    album = os.environ["OK_ALBUM"]
 
     ok = OkApi(access_token=access_token,
                application_key=application_key,
                application_secret_key=application_secret_key)
 
     upload = Upload(ok)
-    upload_response = upload.photo(photos=['1.jpg', '2.jpg'])
+    upload_response = upload.photo(photos=[image_file_name], album=album)
 
     for photo_id in upload_response['photos']:
         token = upload_response['photos'][photo_id]['token']
@@ -25,7 +24,5 @@ def main():
 
     print(ok.friends.get())
 
-
-
-if __name__ == '__main__':
-    main()
+    response = ok.friends.get(sort_type='PRESENT')
+    print(response.json())
