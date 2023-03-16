@@ -1,19 +1,39 @@
-import sheet_functions
+from urllib import parse
+
+import gspread
 import requests
 
+import sheet_functions
 
 from pathlib import Path
 from environs import Env
-from urllib import parse
-
 
 import vk_publication
 import ok_publication
+
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
+SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
+WORKSHEET = SPREADSHEET.sheet1
 
 
 def main():
     env = Env()
     env.read_env()
+
+    # telegram_bot_token = env('TELEGRAM_BOT_TOKEN')
+    # telegram_chat_id = env('TELEGRAM_CHAT_ID')
+    #
+    # while True:
+    #     all_posts = sheet_functions.get_all_records()
+    #
+    #     for post_number, post in enumerate(all_posts, start=2):
+    #         formatted_datetime = sheet_functions.get_formatted_datetime(post)
+    #         datetime_now = sheet_functions.get_datetime_now()
+    #
+    #         if formatted_datetime <= datetime_now and post['public_fact'] != '':
+    #             send_telegram_post(telegram_bot_token, telegram_chat_id, post)
+    #             sheet_functions.post_cell_text(post_number, 7, datetime_now)
+    #             time.sleep(300)
 
     # всего постов
     posts_count = sheet_functions.get_posts_count()
@@ -38,9 +58,12 @@ def main():
 
 def get_posts_text_imagefile(post_number):
     all_posts = sheet_functions.get_all_records()
-    post = all_posts[post_number-1]
+    post = all_posts[post_number - 1]
     image_file_name = Path(parse.urlsplit(post['photo_url']).path).name
 
+    all_posts = sheet_functions.get_all_posts()
+
+    # send_telegram_post(telegram_bot_token, telegram_chat_id, post)
     post_image = requests.get(post['photo_url'])
     post_image.raise_for_status()
 
