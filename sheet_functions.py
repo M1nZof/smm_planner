@@ -1,9 +1,12 @@
 import gspread
+import gdown
+import json
 
 
 from gspread import utils
 from pathlib import Path
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 
 GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
@@ -16,11 +19,13 @@ RED = {'red': 1.0, 'green': 0.0, 'blue': 0.0}
 
 
 def main():
+    # примеры сделанных функций
     # print(get_all_posts())
     # get_posts_count()
     # get_all_records()
-    format_cell(1, 1, BLACK, GREEN)
-    WORKSHEET.update_cell(5, 4, 'проба')  # post some text
+    # format_cell(1, 1, BLACK, GREEN)
+    # WORKSHEET.update_cell(5, 4, 'проба')  # post some text
+    pass
 
 
 def format_date(str_date):
@@ -55,8 +60,7 @@ def get_all_times():
 
 
 def get_posts_count():
-    posts_count = len(WORKSHEET.col_values(1)) - 1
-    print(posts_count)
+    return len(WORKSHEET.col_values(1)) - 1
 
 
 def post_cell_text(row, col, text=''):
@@ -71,6 +75,24 @@ def format_cell(row, col, b_color, f_color):
             "foregroundColor": f_color,
         }
     })
+
+
+def get_post_text(post):
+    gdown.download(url=post['link_google_document'], output='temp_post_file', fuzzy=True, quiet=True)
+    with open('temp_post_file', 'r', encoding='UTF-8') as file:
+        soup = BeautifulSoup(file, 'html.parser')
+        scripts = soup.find_all({'script': 'nonce'})
+        text = ''
+        for script in scripts:
+            if script.text.startswith('DOCS_modelChunk ='):
+                text = script.text.replace('DOCS_modelChunk = ', '')
+                excess_text_part_char = text.find('; DOCS_modelChunkLoadStart')
+                text = text[:excess_text_part_char]
+                text = json.loads(text)[0]['s']
+    try:
+        Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
+    finally:
+        return text
 
 
 if __name__ == '__main__':

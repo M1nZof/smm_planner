@@ -67,7 +67,7 @@ def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     check_vk_request_error(response)
 
 
-def main():
+def publication_post_vk(post_text, image_file_name):
     env = Env()
     env.read_env()
     vk_access_token = env.str('VK_ACCESS_TOKEN')
@@ -77,15 +77,11 @@ def main():
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
 
-    # эти данные надо брать из скрипта сохранения данных из гугл шита + гугл докс
-    post_file_name = '1.jpg'
-    post_text = 'проба1234'
-
     while True:
         try:
             album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
             photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
-                                                          file_path, post_file_name)
+                                                          file_path, image_file_name)
             post_wall_photo(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
             break
         except requests.exceptions.HTTPError as error:
@@ -95,10 +91,6 @@ def main():
             time.sleep(1)
             continue
 
-        # удаляем временный файл с изображением?
-        # finally:
-        #     Path(Path.joinpath(file_path, post_file_name)).unlink()
-
-
-if __name__ == "__main__":
-    main()
+        # удаляем временный файл с изображением
+        finally:
+            Path(Path.joinpath(file_path, image_file_name)).unlink()  # удаляем файл изображения
