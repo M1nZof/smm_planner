@@ -2,12 +2,10 @@ import gspread
 import gdown
 import json
 
-
 from gspread import utils
 from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
-
 
 GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
@@ -34,8 +32,30 @@ def format_date(str_date):
 
 
 def format_time(str_time):
-    time_ = datetime.strptime(str_time, "%H-%M").time()
+    time_ = datetime.strptime(str_time, "%H:%M").time()
     return time_, time_.strftime("%H:%M")
+
+
+def format_date_and_time_to_datetime(date, time):
+    return datetime(date.year, date.month, date.day, time.hour, time.minute, time.second)
+
+
+def get_date_and_time(post):
+    return post['date'], post['time']
+
+
+def get_formatted_datetime(post):
+    date_, time_ = get_date_and_time(post)
+    formatted_date = format_date(date_)
+    formatted_time = format_time(time_)
+    formatted_datetime = format_date_and_time_to_datetime(formatted_date[0], formatted_time[0])
+    return formatted_datetime
+
+
+def get_datetime_now():
+    datetime_now = datetime.now()
+    return datetime(datetime_now.year, datetime_now.month, datetime_now.day, datetime_now.hour,
+                    datetime_now.minute)
 
 
 def get_all_posts():
