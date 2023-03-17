@@ -1,13 +1,10 @@
 import gspread
-import gdown
-import json
 
 from gspread import utils
 from pathlib import Path
 from datetime import datetime
-from bs4 import BeautifulSoup
 
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd().parent, 'ENV', 'service_account.json').__str__())
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
@@ -55,7 +52,12 @@ def get_all_new_posts():
     all_posts = WORKSHEET.get_all_records()
     all_new_posts = []
     for post in all_posts:
+        # if not post['public_fact'] or post['duration']:           # Если будем удалениями заниматься, нам нужно будет
+                                                                    # поле duration
         if not post['public_fact']:
+            for key, value in post.items():
+                if value == '':
+                    post[key] = None
             all_new_posts.append(post)
     return all_new_posts
 
@@ -89,18 +91,3 @@ def format_cell(row, col, b_color, f_color):
             "foregroundColor": f_color,
         }
     })
-
-
-def get_post_text(post):
-    gdown.download(url=post['link_google_document'], output='temp_post_file', fuzzy=True, quiet=True)
-    with open('temp_post_file', 'r', encoding='UTF-8') as file:
-        soup = BeautifulSoup(file, 'html.parser')
-        scripts = soup.find_all({'script': 'nonce'})
-        text = ''
-        for script in scripts:
-            if script.text.startswith('DOCS_modelChunk ='):
-                text = script.text.replace('DOCS_modelChunk = ', '')
-                excess_text_part_char = text.find('; DOCS_modelChunkLoadStart')
-                text = text[:excess_text_part_char]
-                text = json.loads(text)[0]['s']
-    return text

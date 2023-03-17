@@ -2,15 +2,16 @@ import time
 from urllib import parse
 
 import requests
+from environs import Env
 
 from google_handlers import sheet_functions
 
 from pathlib import Path
 
+from google_handlers.google_document_functions import get_post_text
 from social_networks_handlers.ok_publication import publication_post_ok
-from social_networks_handlers.tg_publication import send_telegram_post
-from social_networks_handlers.vk_publication import publication_post_vk
-from social_networks_handlers.vk_publication import delete_post_vk
+from social_networks_handlers.tg_publication import send_telegram_post, get_telegram_message_id, delete_telegram_post
+from social_networks_handlers.vk_publication import publication_post_vk, delete_post_vk
 
 
 def main():
