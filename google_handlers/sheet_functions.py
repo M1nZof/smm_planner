@@ -86,18 +86,3 @@ def format_cell(row, col, b_color, f_color):
             "foregroundColor": f_color,
         }
     })
-
-
-def get_post_text(post):
-    gdown.download(url=post['link_google_document'], output='temp_post_file', fuzzy=True, quiet=True)
-    with open('temp_post_file', 'r', encoding='UTF-8') as file:
-        soup = BeautifulSoup(file, 'html.parser')
-        scripts = soup.find_all({'script': 'nonce'})
-        text = ''
-        for script in scripts:
-            if script.text.startswith('DOCS_modelChunk ='):
-                text = script.text.replace('DOCS_modelChunk = ', '')
-                excess_text_part_char = text.find('; DOCS_modelChunkLoadStart')
-                text = text[:excess_text_part_char]
-                text = json.loads(text)[0]['s']
-    return text
