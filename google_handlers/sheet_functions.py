@@ -17,28 +17,31 @@ RED = {'red': 1.0, 'green': 0.0, 'blue': 0.0}
 
 
 def format_date(str_date):
-    date_ = datetime.strptime(str_date, "%d.%m.%Y").date()
+    if '-' in str_date:
+        date_ = datetime.strptime(str_date, "%d-%m-%Y").date()
+    if '.' in str_date:
+        date_ = datetime.strptime(str_date, "%d.%m.%Y").date()
+    else:
+        print('Неверно введена дата ')
+        return False
     return date_, date_.strftime("%Y-%m-%d"), date_.strftime("%Y/%m/%d")
 
 
 def format_time(str_time):
-    time_ = datetime.strptime(str_time, "%H:%M").time()
+    if '-' in str_time:
+        time_ = datetime.strptime(str_time, "%H-%M").time()
+    elif ':' in str_time:
+        time_ = datetime.strptime(str_time, "%H:%M").time()
+    else:
+        print('Неверно введено время ')
+        return False
     return time_, time_.strftime("%H:%M")
 
 
-def format_date_and_time_to_datetime(date, time):
-    return datetime(date.year, date.month, date.day, time.hour, time.minute, time.second)
-
-
-def get_date_and_time(post):
-    return post['date'], post['time']
-
-
-def get_formatted_datetime(post):
-    date_, time_ = get_date_and_time(post)
-    formatted_date = format_date(date_)
-    formatted_time = format_time(time_)
-    formatted_datetime = format_date_and_time_to_datetime(formatted_date[0], formatted_time[0])
+def get_formatted_datetime(post_date, post_time):
+    date_ = format_date(post_date)[0]
+    time_ = format_time(post_time)[0]
+    formatted_datetime = datetime(date_.year, date_.month, date_.day, time_.hour, time_.minute, time_.second)
     return formatted_datetime
 
 
