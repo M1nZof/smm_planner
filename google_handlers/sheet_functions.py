@@ -4,7 +4,7 @@ from gspread import utils
 from pathlib import Path
 from datetime import datetime
 
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd().parent, 'ENV', 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
@@ -52,12 +52,8 @@ def get_all_new_posts():
     all_posts = WORKSHEET.get_all_records()
     all_new_posts = []
     for post in all_posts:
-        # if not post['public_fact'] or post['duration']:           # Если будем удалениями заниматься, нам нужно будет
-                                                                    # поле duration
-        if not post['public_fact']:
-            for key, value in post.items():
-                if value == '':
-                    post[key] = None
+        if post['link_google_document'] and ((post['Telegram'] and not post['Telegram_rez']) or (post['VK'] and not post['VK_rez'])\
+                or (post['OK'] and not post['OK_rez'])):
             all_new_posts.append(post)
     return all_new_posts
 

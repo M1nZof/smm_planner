@@ -65,7 +65,6 @@ def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     response.raise_for_status()
     response = response.json()
     check_vk_request_error(response)
-    print(response)
     return response['response']['post_id']
 
 
