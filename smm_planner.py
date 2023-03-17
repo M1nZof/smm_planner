@@ -50,8 +50,6 @@ def main():
                             publication_post_vk(post_text, image_file_name)
                         elif post['social_network'] == 'OK':
                             publication_post_ok(post_text, image_file_name)
-                            if isinstance(post_id, list):
-                                post_id = [id_ for id_ in post_id]
                         cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
                         if isinstance(post_id, list):
                             sheet_functions.post_cell_text(cell.row, 7,
