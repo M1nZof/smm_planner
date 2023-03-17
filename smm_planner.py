@@ -31,7 +31,7 @@ def main():
                 cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
                 if post_result:
                     sheet_functions.format_cell(cell.row, 7, sheet_functions.GREEN, sheet_functions.BLACK)
-                    sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
+                    sheet_functions.post_cell_text(cell.row, 7, f'Опубликован {str(sheet_functions.get_datetime_now())}')
                 else:
                     sheet_functions.format_cell(cell.row, 7, sheet_functions.RED, sheet_functions.GREEN)
                     sheet_functions.post_cell_text(cell.row, 7, 'Ошибка публикации')
