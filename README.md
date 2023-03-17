@@ -18,3 +18,8 @@ OK_ALBUM='948038190217'
 OK_ALBUM берется из командной строки после создания нужного Альбома
 
 <img width="408" alt="image" src="https://user-images.githubusercontent.com/55636018/225689782-f46ddfe9-9829-4028-b24b-cae74c35b749.png">
+
+Если в сообщение не было картинки, то оно выводится ввиде картинки
+
+<img width="620" alt="image" src="https://user-images.githubusercontent.com/55636018/225830469-db80672e-1139-4f0b-9f35-cb844c8b5bda.png">
+
