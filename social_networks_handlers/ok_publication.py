@@ -23,10 +23,11 @@ def delet_img(photo_id):
     application_key = os.environ["OK_APPLICATION_KEY"]
     application_secret_key = os.environ["OK_SECRET_KEY"]
     ok_user = os.environ["OK_USER"]
+    ok_application_id = os.environ["OK_APPLICATION_ID"]
 
     headers = {'client_id': ok_user}
     params = {
-        'scope': 512001823570,
+        'scope': ok_application_id,
         'access_token': access_token,
         'application_key': application_key,
         'session_secret_key': application_secret_key,
