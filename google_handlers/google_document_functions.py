@@ -5,13 +5,8 @@ import gdown
 from bs4 import BeautifulSoup
 
 
-def collecting_google_document(link_google_document):
-    document_name = str(urlparse(link_google_document).path.split('/')[-2])
-    text = download_google_document(link_google_document, document_name)
-    return text
-
-
-def download_google_document(link_google_document, document_name):
+def get_post_text(link_google_document):
+    document_name = 'temp_post_file'
     gdown.download(url=link_google_document, output=document_name, fuzzy=True, quiet=True)
     text = get_google_document_text(document_name)
     return text
