@@ -49,7 +49,10 @@ def get_all_new_posts():
     all_posts = WORKSHEET.get_all_records()
     all_new_posts = []
     for post in all_posts:
-        if not post['public_fact']:
+        if not post['public_fact'] or post['duration']:
+            for key, value in post.items():
+                if value == '':
+                    post[key] = None
             all_new_posts.append(post)
     return all_new_posts
 
