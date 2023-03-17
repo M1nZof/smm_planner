@@ -17,19 +17,25 @@ def main():
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
         for post_number, post in enumerate(all_new_posts):
-            formatted_datetime = sheet_functions.get_formatted_datetime(post)
+            formatted_datetime = sheet_functions.get_formatted_datetime(post['date'], post['time'])
             datetime_now = sheet_functions.get_datetime_now()
             if formatted_datetime <= datetime_now:
                 post_text, image_file_name = get_posts_text_imagefile(post)
                 if post['social_network'] == 'Telegram':
-                    send_telegram_post(post)
+                    post_result = send_telegram_post(post)
                 elif post['social_network'] == 'VK':
-                    publication_post_vk(post_text, image_file_name)
+                    post_result = publication_post_vk(post_text, image_file_name)
                 elif post['social_network'] == 'OK':
-                    publication_post_ok(post_text, image_file_name)
+                    post_result = publication_post_ok(post_text, image_file_name)
 
                 cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
-                sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
+                if post_result:
+                    sheet_functions.format_cell(cell.row, 7, sheet_functions.GREEN, sheet_functions.BLACK)
+                    sheet_functions.post_cell_text(cell.row, 7, str(sheet_functions.get_datetime_now()))
+                else:
+                    sheet_functions.format_cell(cell.row, 7, sheet_functions.RED, sheet_functions.GREEN)
+                    sheet_functions.post_cell_text(cell.row, 7, 'Ошибка публикации')
+
                 time.sleep(3)
 
                 Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
@@ -40,7 +46,7 @@ def main():
 
 
 def get_posts_text_imagefile(post):
-    image_file_name = Path(parse.urlsplit(post['photo_url']).path).name
+    image_file_name = f'image_file{Path(parse.urlsplit(post["photo_url"]).path).suffix}'
     post_image = requests.get(post['photo_url'])
     post_image.raise_for_status()
 
