@@ -10,9 +10,12 @@ from pathlib import Path
 from social_networks_handlers.ok_publication import publication_post_ok
 from social_networks_handlers.tg_publication import send_telegram_post
 from social_networks_handlers.vk_publication import publication_post_vk
+from social_networks_handlers.vk_publication import delete_post_vk
 
 
 def main():
+    print(delete_post_vk(193))
+    exit()
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
         for post_number, post in enumerate(all_new_posts):
