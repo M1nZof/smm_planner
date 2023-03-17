@@ -2,17 +2,17 @@ import os
 from ok_api import OkApi, Upload
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw, ImageFont
-import sys
 
-def not_img(post_text):
-    img = Image.new('RGBA', (200, 200), 'white')
+
+def not_img(text):
+    img = Image.new('RGBA', (600, 400), 'white')
     idraw = ImageDraw.Draw(img)
     img.save('post.png')
     image = Image.open('post.png')
     idraw = ImageDraw.Draw(image)
-
+    black = (240, 8, 12)
     font = ImageFont.truetype('FreeMono.ttf', size=18)
-    idraw.text((10, 10), post_text, font=font, color='red')
+    idraw.text((10, 30), text, fill=black, font=font, color='red')
     image.save('post.png')
 
 
@@ -38,10 +38,11 @@ def publication_post_ok(post_text, image_file_name):
         token = upload_response['photos'][photo_id]['token']
         response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
     try:
-        if response.json()['photos'][0]['status'] == 'SUCCESS':
-            return True
+        id = response.json()['photos'][0]['photo_id']
+        if id:
+            return id
     except:
-        return False
+        return None
 
 
 def main():
