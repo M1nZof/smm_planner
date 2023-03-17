@@ -65,14 +65,36 @@ def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     response.raise_for_status()
     response = response.json()
     check_vk_request_error(response)
+    print(response)
+    return response['response']['post_id']
 
 
-def publication_post_vk(post_text, image_file_name):
+def delete_post_vk(post_id):
+    vk_access_token, vk_group_id, vk_authorization = get_connect_params_vk()
+    url = 'https://api.vk.com/method/wall.delete'
+    payload = {
+        'owner_id': int(f'-{vk_group_id}'),
+        'post_id': post_id,
+        'v': 5.131,
+    }
+    response = requests.post(url, headers=vk_authorization, params=payload)
+    response.raise_for_status()
+    response = response.json()
+    check_vk_request_error(response)
+    return response
+
+
+def get_connect_params_vk():
     env = Env()
     env.read_env()
     vk_access_token = env.str('VK_ACCESS_TOKEN')
     vk_group_id = env.int('VK_GROUP_ID')
     vk_authorization = {'Authorization': f'Bearer {vk_access_token}'}
+    return vk_access_token, vk_group_id, vk_authorization
+
+
+def publication_post_vk(post_text, image_file_name):
+    vk_access_token, vk_group_id, vk_authorization = get_connect_params_vk()
 
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
