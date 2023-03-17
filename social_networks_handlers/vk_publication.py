@@ -95,7 +95,6 @@ def get_connect_params_vk():
 
 def publication_post_vk(post_text, image_file_name):
     vk_access_token, vk_group_id, vk_authorization = get_connect_params_vk()
-
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
 
