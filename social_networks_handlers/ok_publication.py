@@ -28,29 +28,6 @@ def not_img(text):
     image.save('post.png')
 
 
-def delet_img(photo_id):
-    access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
-    headers = {'client_id': ok_user}
-    params = {
-        'scope': ok_application_id,
-        'access_token': access_token,
-        'application_key': application_key,
-        'session_secret_key': application_secret_key,
-        'response_type': 'token',
-        'redirect_uri': 'https://apiok.ru/oauth_callback',
-        'photo_id': photo_id,
-        'method': 'photos.deletePhoto'
-    }
-    url_sesion = 'https://api.ok.ru/fb.do'
-    response = requests.post(url_sesion, headers=headers, params=params)
-    try:
-        response.raise_for_status()
-        response_message = response.json()
-        return True
-    except:
-        return False
-
-
 def publication_post_ok(post_text, image_file_name):
     access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
     if not image_file_name:
@@ -60,7 +37,12 @@ def publication_post_ok(post_text, image_file_name):
                application_key=application_key,
                application_secret_key=application_secret_key)
     upload = Upload(ok)
-    upload_response = upload.photo(photos=[image_file_name], album=album)
+    
+    try:
+        upload_response = upload.photo(photos=[image_file_name], album=album)
+        except:
+        return False, 'Такого Альбома в ОК нет, либо у Вас нет прав'
+    
     for photo_id in upload_response['photos']:
         token = upload_response['photos'][photo_id]['token']
         response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
@@ -69,4 +51,4 @@ def publication_post_ok(post_text, image_file_name):
         if img_id:
             return img_id
     except:
-        return False, 'post error'  # ни фига здесь не ерорю А гдже ерорр взять?
+        return False, 'Ошибка выгрузки'
