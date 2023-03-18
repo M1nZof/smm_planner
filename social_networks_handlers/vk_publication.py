@@ -111,7 +111,7 @@ def publication_post_vk(post_text, image_file_name):
             print(f'Ошибка соединения сети.\nОшибка {error}')
             error_count += 1
             time.sleep(1)
-            if error_count < 2:    # количество попывток подключения при разрыве соединения
+            if error_count < 11:    # количество попывток подключения при разрыве соединения
                 continue
             return False, str(error)[:20]   # количество символов из строки ошибки
     return True, 0
