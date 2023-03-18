@@ -1,8 +1,19 @@
-import os
 from ok_api import OkApi, Upload
-from dotenv import load_dotenv
+from environs import Env
 from PIL import Image, ImageDraw, ImageFont
 import requests
+
+
+def get_ok_environs():
+    env = Env()
+    env.read_env()
+    access_token = env("OK_ACCESS_TOKEN")
+    application_key = env("OK_APPLICATION_KEY")
+    application_secret_key = env("OK_SECRET_KEY")
+    ok_user = env("OK_USER")
+    ok_application_id = env("OK_APPLICATION_ID")
+    album = env("OK_ALBUM")
+    return access_token, application_key, application_secret_key, ok_user, ok_application_id, album
 
 
 def not_img(text):
@@ -18,13 +29,7 @@ def not_img(text):
 
 
 def delet_img(photo_id):
-    load_dotenv()
-    access_token = os.environ["OK_ACCESS_TOKEN"]
-    application_key = os.environ["OK_APPLICATION_KEY"]
-    application_secret_key = os.environ["OK_SECRET_KEY"]
-    ok_user = os.environ["OK_USER"]
-    ok_application_id = os.environ["OK_APPLICATION_ID"]
-
+    access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
     headers = {'client_id': ok_user}
     params = {
         'scope': ok_application_id,
@@ -43,46 +48,26 @@ def delet_img(photo_id):
         response_message = response.json()
         return True
     except:
-        print('Что то опять не так')
         return False
 
 
 def publication_post_ok(post_text, image_file_name):
-    load_dotenv()
-    access_token = os.environ["OK_ACCESS_TOKEN"]
-    application_key = os.environ["OK_APPLICATION_KEY"]
-    application_secret_key = os.environ["OK_SECRET_KEY"]
-    album = os.environ["OK_ALBUM"]
-
+    access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
     if not image_file_name:
         not_img(post_text)
         image_file_name = 'post.png'
-
     ok = OkApi(access_token=access_token,
                application_key=application_key,
                application_secret_key=application_secret_key)
-
     upload = Upload(ok)
     upload_response = upload.photo(photos=[image_file_name], album=album)
-
     for photo_id in upload_response['photos']:
         token = upload_response['photos'][photo_id]['token']
         response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
     try:
-        id = response.json()['photos'][0]['photo_id']
-        if id:
-            return id
+        img_id = response.json()['photos'][0]['photo_id']
+        if img_id:
+            return img_id
     except:
         return None
 
-
-def main():
-    post_text = 'Это сообщение было без картинки'
-    image_file_name = ''
-    photo_id = publication_post_ok(post_text, image_file_name)
-    print(photo_id)
-    delet_img(photo_id)
-
-
-if __name__ == '__main__':
-    main()
