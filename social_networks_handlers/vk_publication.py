@@ -96,7 +96,7 @@ def publication_post_vk(post_text, image_file_name):
     vk_access_token, vk_group_id, vk_authorization = get_connect_params_vk()
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
-
+    error_count = 0
     while True:
         try:
             album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
@@ -106,9 +106,12 @@ def publication_post_vk(post_text, image_file_name):
             break
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка сети.\nОшибка {error}')
-            return False
+            return False, str(error)[:20]   # количество символов из строки ошибки
         except requests.exceptions.ConnectionError as error:
             print(f'Ошибка соединения сети.\nОшибка {error}')
+            error_count += 1
             time.sleep(1)
-            continue
-    return True
+            if error_count < 2:    # количество попывток подключения при разрыве соединения
+                continue
+            return False, str(error)[:20]   # количество символов из строки ошибки
+    return True, 0

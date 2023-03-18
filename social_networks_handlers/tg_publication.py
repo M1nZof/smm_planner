@@ -22,7 +22,9 @@ def send_telegram_post(post_text, image_name):
                 message = bot.send_message(telegram_chat_id, post_text)
                 post.append(message_with_photo)
                 post.append(message)
-    return post
+    if post:
+        return True, post
+    return False, 'post error'
 
 
 def delete_telegram_post(message_id):

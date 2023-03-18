@@ -69,5 +69,4 @@ def publication_post_ok(post_text, image_file_name):
         if img_id:
             return img_id
     except:
-        return None
-
+        return False, 'post error'  # ни фига здесь не ерорю А гдже ерорр взять?
