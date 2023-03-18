@@ -1,7 +1,10 @@
-from ok_api import OkApi, Upload
+import requests
+
+from ok_api import OkApi, Upload, ok_exceptions
 from environs import Env
 from PIL import Image, ImageDraw, ImageFont
-import requests
+
+from errors_classes import SocialNetworkError
 
 
 def get_ok_environs():
@@ -16,7 +19,7 @@ def get_ok_environs():
     return access_token, application_key, application_secret_key, ok_user, ok_application_id, album
 
 
-def not_img(text):
+def convert_text_to_picture(text):      # Переименовал функцию. Просто звучнее как-то в логике кода смотрится
     img = Image.new('RGBA', (600, 400), 'white')
     idraw = ImageDraw.Draw(img)
     img.save('post.png')
@@ -31,24 +34,35 @@ def not_img(text):
 def publication_post_ok(post_text, image_file_name):
     access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
     if not image_file_name:
-        not_img(post_text)
+        convert_text_to_picture(post_text)
         image_file_name = 'post.png'
     ok = OkApi(access_token=access_token,
                application_key=application_key,
                application_secret_key=application_secret_key)
     upload = Upload(ok)
-    
+
     try:
         upload_response = upload.photo(photos=[image_file_name], album=album)
-        except:
-        return False, 'Такого Альбома в ОК нет, либо у Вас нет прав'
-    
-    for photo_id in upload_response['photos']:
-        token = upload_response['photos'][photo_id]['token']
-        response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
-    try:
-        img_id = response.json()['photos'][0]['photo_id']
-        if img_id:
-            return img_id
-    except:
-        return False, 'Ошибка выгрузки'
+        for photo_id in upload_response['photos']:
+            token = upload_response['photos'][photo_id]['token']
+            response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
+            # TODO здесь лучше ловить ответ от ОК по аналогии с вк, т.к., например, слишком длинные сообщения не хотят
+            #  кидаться, но исключения нет, а только тот же response. Если будет реализовано, то проблема ниже
+            #  будет решена
+            photo_id = response.json()['photos'][0]['photo_id']
+            return photo_id
+
+    except ok_exceptions.OkApiException as error:
+        # Странно, но иногда кидаются исключения, а иногда возвращается response как будто все ОК
+        raise SocialNetworkError(error.__dict__['message']['error_msg'])
+
+    except requests.exceptions.HTTPError:
+        raise requests.exceptions.HTTPError
+
+    except requests.exceptions.ConnectionError:
+        raise requests.exceptions.ConnectionError
+
+    except KeyError:
+        # Здесь я не придумал какую лучше ошибку ловить. Можно пробовать поднимать кастомную, если в response
+        # есть ['error_msg']. Оставил пока так, чтобы обсудить
+        raise SocialNetworkError(response.json()['error_msg'])
