@@ -24,13 +24,13 @@ def main():
             if post['Telegram'] == 'TRUE' and not post['Telegram_rez']:
                 post_result = send_telegram_post(post_text, image_file_name)
                 put_mark(cell.row, 5, post_result)
-            elif post['VK'] == 'TRUE' and not post['VK_rez']:
+            if post['VK'] == 'TRUE' and not post['VK_rez']:
                 post_result = publication_post_vk(post_text, image_file_name)
                 put_mark(cell.row, 6, post_result)
-            elif post['OK'] == 'TRUE' and not post['OK_rez']:
+            if post['OK'] == 'TRUE' and not post['OK_rez']:
                 post_result = publication_post_ok(post_text, image_file_name)
                 put_mark(cell.row, 7, post_result)
-            time.sleep(3)
+
             Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
             Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
 
