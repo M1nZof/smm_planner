@@ -51,11 +51,15 @@ def get_datetime_now():
 def get_all_new_posts():
     all_posts = WORKSHEET.get_all_records()
     all_new_posts = []
-    for post in all_posts:
-        if post['link_google_document'] and ((post['Telegram'] and not post['Telegram_rez']) or (post['VK'] and not post['VK_rez'])\
-                or (post['OK'] and not post['OK_rez'])):
+    for num, post in enumerate(all_posts):
+        print(num, post['Telegram'], post['Telegram_rez'])
+        if (post['link_google_document'] and (post['Telegram'] == 'TRUE' and not post['Telegram_rez'])):
+            print(num, 'Телега не опубликована')
+        if post['link_google_document'] and ((post['Telegram'] == 'TRUE' and not post['Telegram_rez']) or (post['VK'] == 'TRUE' and not post['VK_rez'])\
+                or (post['OK'] == 'TRUE' and not post['OK_rez'])):
             all_new_posts.append(post)
-    return all_new_posts
+        elif not post['link_google_document']:
+            return all_new_posts
 
 
 def get_all_records():
