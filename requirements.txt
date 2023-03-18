@@ -6,3 +6,4 @@ requests==2.28.2
 gdown==4.6.4
 beautifulsoup4==4.11.2
 Pillow==9.4.0
+ok_api == 1.0.1
