@@ -14,9 +14,9 @@ from social_networks_handlers.vk_publication import publication_post_vk
 def main():
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
+        datetime_now = sheet_functions.get_datetime_now()
         for post_number, post in enumerate(all_new_posts):
             formatted_datetime = sheet_functions.get_formatted_datetime(post['date'], post['time'])
-            datetime_now = sheet_functions.get_datetime_now()
             if not formatted_datetime <= datetime_now:
                 break
             post_text, image_file_name = get_posts_text_imagefile(post)
