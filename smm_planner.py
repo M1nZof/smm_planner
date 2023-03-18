@@ -34,17 +34,17 @@ def main():
             Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
             Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
 
-        time.sleep(30)  # ограничение запроса к Гуглу, иначе блокирует доступ
+        time.sleep(3)  # ограничение запроса к Гуглу, иначе блокирует доступ
 # https://stackoverflow.com/questions/65153922/why-am-i-receiving-a-quota-limit-error-google-cloud-platform-compute-engine-vm
 
 
 def put_mark(row, col, post_result):
-    if post_result:
+    if post_result[0]:
         sheet_functions.format_cell(row, col, sheet_functions.BLACK, sheet_functions.GREEN)
         sheet_functions.post_cell_text(row, col+3, f'Public at {str(sheet_functions.get_datetime_now())}')
     else:
         sheet_functions.format_cell(row, col, sheet_functions.BLACK, sheet_functions.RED)
-        sheet_functions.post_cell_text(row, col+3, 'Public error')
+        sheet_functions.post_cell_text(row, col+3, post_result[1])
 
 
 def get_posts_text_imagefile(post):
