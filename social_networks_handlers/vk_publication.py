@@ -55,16 +55,19 @@ def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
             'attachments': f"photo{photo_owner_id}_{photo_id}",
             'owner_id': int(f'-{vk_group_id}'),
             'from_group': 1,
-            'message': post_alt,
             'v': 5.131,
         }
-        response = requests.post(url, headers=vk_access, params=payload)
+        data = {
+            'message': post_alt
+        }
+        response = requests.post(url, headers=vk_access, params=payload, data=data)
         response.raise_for_status()
         response = response.json()
         check_vk_request_error(response)
         return response['response']['post_id']
 
     except SocialNetworkError as error:
+        print(f'где то здесь: {error}')
         raise SocialNetworkError(error)
 
     except requests.exceptions.HTTPError as error:
