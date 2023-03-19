@@ -27,7 +27,10 @@ def convert_text_to_picture(text):
     idraw = ImageDraw.Draw(image)
     black = (240, 8, 12)
     font = ImageFont.truetype('FreeMono.ttf', size=18)
-    idraw.text((10, 30), text, fill=black, font=font, color='red')
+    line_number = 30
+    for x in range(0, len(text), 50):
+        idraw.text((10, line_number), (text[x:x + 50]), fill=black, font=font, color='red')
+        line_number = line_number + 30
     image.save('post.png')
 
 
