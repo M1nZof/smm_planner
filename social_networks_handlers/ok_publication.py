@@ -68,4 +68,4 @@ def publication_post_ok(post_text, image_file_name):
         # есть ['error_msg']. Оставил пока так, чтобы обсудить
         
         # Эта ошибка не ловится вообще - ее не бывает, как я не пытался сломать
-        raise SocialNetworkError(response.json()['error_msg'])
+        raise SocialNetworkError({'col': 7, 'message': response.json()['error_msg']})

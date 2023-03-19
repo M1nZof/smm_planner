@@ -116,4 +116,4 @@ def publication_post_vk(post_text, image_file_name):
         raise requests.exceptions.ConnectionError(error)
 
     except SocialNetworkError as error:
-        raise SocialNetworkError(error)
+        raise SocialNetworkError({'col': 6, 'message': error})
