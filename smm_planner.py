@@ -27,7 +27,13 @@ def main():
                 # Избыточные проверки (обрабатываются в get_all_new_posts
 
                 post_text = get_posts_post_text(post)
-                image_file_name = download_posts_image_file_name(post)
+                image_file_name = None
+                try:
+                    image_file_name = download_posts_image_file_name(get_post_image_url(post))
+                except Exception:
+                    pass
+                # image_file_name = download_posts_image_file_name(post)
+
                 try:
                     if post['Telegram'] == 'TRUE' and not post['Telegram_result']:
                         # TODO в будущем переименовать на нормальное значение ("rez" - типо результат? :/)
@@ -71,10 +77,10 @@ def put_mark(row, col, post_result, error=False):
         sheet_functions.post_cell_text(row, col + 3, str(post_result))
 
 
-def download_posts_image_file_name(post):
+def download_posts_image_file_name(image_url):
     try:
-        image_file_name = f'image_file{Path(parse.urlsplit(post["photo_url"]).path).suffix}'
-        post_image = requests.get(post['photo_url'])
+        image_file_name = f'image_file{Path(parse.urlsplit(image_url).path).suffix}'
+        post_image = requests.get(image_url)
         post_image.raise_for_status()
 
         file_path = Path.cwd()
@@ -86,10 +92,33 @@ def download_posts_image_file_name(post):
         return
 
 
+# def download_posts_image_file_name(post):
+#     try:
+#         image_file_name = f'image_file{Path(parse.urlsplit(post["photo_url"]).path).suffix}'
+#         post_image = requests.get(post['photo_url'])
+#         post_image.raise_for_status()
+#
+#         file_path = Path.cwd()
+#         with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
+#             file.write(post_image.content)
+#
+#         return image_file_name
+#     except requests.exceptions.MissingSchema:
+#         return
+
+
 def get_posts_post_text(post):
     try:
         post_text = google_document_functions.get_post_text(post['link_google_document'])
         return post_text
+    except requests.exceptions.MissingSchema:
+        return
+
+
+def get_post_image_url(post):
+    try:
+        image_url = google_document_functions.get_post_image_url(post['link_google_document'])
+        return image_url
     except requests.exceptions.MissingSchema:
         return
 
