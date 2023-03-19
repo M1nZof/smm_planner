@@ -16,14 +16,20 @@ def main():
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
         datetime_now = sheet_functions.get_datetime_now()
-        for post_number, post in enumerate(all_new_posts):
+        for post in all_new_posts:
             formatted_datetime = sheet_functions.get_formatted_datetime(post['date'], post['time'])
             if not formatted_datetime <= datetime_now:
                 break
-            post_text, image_file_name = get_posts_text_imagefile(post)
-            # TODO лучше разбить получение фото и текста на разные функции
-            cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
-            # TODO вместо поиска лучше как-то передавать с публикацией поста номера столбца и строки. Я еще подумаю
+            post_text = get_posts_post_text(post)
+            image_file_name = download_posts_image_file_name(post)
+            # Разбил на 2 отдельных метода
+
+
+            # cell = sheet_functions.WORKSHEET.find(post['link_google_document'])
+                # Убрал в пользу определения столбца в ошибках и в блоке ниже (см. строки 31, 34, 37) и
+                # tg_publication.py 37 строку.
+                # Позже можно передать как константы, которые получаются при начале работы скрипта
+                # по аналогии с sheet_functions.py (первые строки)
             try:
                 if post['Telegram'] == 'TRUE' and not post['Telegram_rez']:
                     # TODO в будущем переименовать на нормальное значение ("rez" - типо результат? :/)
@@ -68,7 +74,7 @@ def put_mark(row, col, post_result):
         sheet_functions.post_cell_text(row, col + 3, str(post_result))
 
 
-def get_posts_text_imagefile(post):
+def download_posts_image_file_name(post):
     image_file_name = f'image_file{Path(parse.urlsplit(post["photo_url"]).path).suffix}'
     post_image = requests.get(post['photo_url'])
     post_image.raise_for_status()
@@ -77,8 +83,12 @@ def get_posts_text_imagefile(post):
     with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
         file.write(post_image.content)
 
+    return image_file_name
+
+
+def get_posts_post_text(post):
     post_text = google_document_functions.get_post_text(post['link_google_document'])
-    return post_text, image_file_name
+    return post_text
 
 
 if __name__ == '__main__':
