@@ -4,7 +4,7 @@ from gspread import utils
 from pathlib import Path
 from datetime import datetime
 
-GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd().parent, 'ENV', 'service_account.json').__str__())
+GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
@@ -52,16 +52,18 @@ def get_all_new_posts():
     all_posts = WORKSHEET.get_all_records()
     all_new_posts = []
     datetime_now = get_datetime_now()
-    for num, post in enumerate(all_posts):
-        if post['link_google_document']:
-            formatted_datetime = get_formatted_datetime(post['date'], post['time'])
-        if post['link_google_document'] and formatted_datetime <= datetime_now \
-                and ((post['Telegram'] == 'TRUE' and not post['Telegram_rez'])
-                     or (post['VK'] == 'TRUE' and not post['VK_rez'])
-                     or (post['OK'] == 'TRUE' and not post['OK_rez'])):
+    for num, post in enumerate(all_posts, start=2):
+        if post['link_google_document'] == '' and post['photo_url'] == '':
+            continue
+        post['row'] = num
+        formatted_datetime = get_formatted_datetime(post['date'], post['time'])
+        if (post['link_google_document'] or post['photo_url']) and formatted_datetime <= datetime_now \
+                and ((post['Telegram'] == 'TRUE' and post['Telegram_rez'] == '')
+                     or (post['VK'] == 'TRUE' and post['VK_rez'] == '')
+                     or (post['OK'] == 'TRUE' and post['OK_rez'] == '')):
             all_new_posts.append(post)
-        elif not post['link_google_document']:
-            return all_new_posts
+
+    return all_new_posts
 
 
 def get_all_records():

@@ -1,19 +1,15 @@
 import requests
-import time
 
-
-from urllib.error import HTTPError
 from pathlib import Path
 from environs import Env
 
+from errors_classes import SocialNetworkError
+
 
 def check_vk_request_error(response):
-    error_code = 0
     if 'error' in response:
         error_message = response['error']['error_msg']
-        if response['error']['error_code']:
-            error_code = response['error']['error_code']
-        raise HTTPError('Ошибка сервиса ВКонтакте', error_code, error_message, error_message, None)
+        raise SocialNetworkError(f'Ошибка сервиса ВКонтакте {error_message}')
 
 
 def get_photos_wall_upload_server(vk_access, vk_group_id):
@@ -54,18 +50,31 @@ def save_photo_to_wall(vk_access, vk_group_id, upload_url, file_path, post_file_
 
 def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     url = 'https://api.vk.com/method/wall.post'
-    payload = {
-        'attachments': f"photo{photo_owner_id}_{photo_id}",
-        'owner_id': int(f'-{vk_group_id}'),
-        'from_group': 1,
-        'message': post_alt,
-        'v': 5.131,
-    }
-    response = requests.post(url, headers=vk_access, params=payload)
-    response.raise_for_status()
-    response = response.json()
-    check_vk_request_error(response)
-    return response['response']['post_id']
+    try:
+        payload = {
+            'attachments': f"photo{photo_owner_id}_{photo_id}",
+            'owner_id': int(f'-{vk_group_id}'),
+            'from_group': 1,
+            'v': 5.131,
+        }
+        data = {
+            'message': post_alt
+        }
+        response = requests.post(url, headers=vk_access, params=payload, data=data)
+        response.raise_for_status()
+        response = response.json()
+        check_vk_request_error(response)
+        return response['response']['post_id']
+
+    except SocialNetworkError as error:
+        print(f'где то здесь: {error}')
+        raise SocialNetworkError(error)
+
+    except requests.exceptions.HTTPError as error:
+        raise SocialNetworkError(error.response.reason)
+
+    except requests.exceptions.ConnectionError as error:
+        raise requests.exceptions.ConnectionError(error)
 
 
 def delete_post_vk(post_id):
@@ -96,22 +105,18 @@ def publication_post_vk(post_text, image_file_name):
     vk_access_token, vk_group_id, vk_authorization = get_connect_params_vk()
     file_path = Path.cwd()
     Path(file_path).mkdir(parents=True, exist_ok=True)
-    error_count = 0
-    while True:
-        try:
-            album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
-            photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
-                                                          file_path, image_file_name)
-            post_wall_photo(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
-            break
-        except requests.exceptions.HTTPError as error:
-            print(f'Ошибка сети.\nОшибка {error}')
-            return False, str(error)[:20]   # количество символов из строки ошибки
-        except requests.exceptions.ConnectionError as error:
-            print(f'Ошибка соединения сети.\nОшибка {error}')
-            error_count += 1
-            time.sleep(1)
-            if error_count < 11:    # количество попывток подключения при разрыве соединения
-                continue
-            return False, str(error)[:20]   # количество символов из строки ошибки
-    return True, 0
+    try:
+        album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
+        photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
+                                                      file_path, image_file_name)
+        post_id = post_wall_photo(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
+        return post_id
+
+    except requests.exceptions.HTTPError as error:
+        raise requests.exceptions.HTTPError(error)
+
+    except requests.exceptions.ConnectionError as error:
+        raise requests.exceptions.ConnectionError(error)
+
+    except SocialNetworkError as error:
+        raise SocialNetworkError({'col': 6, 'message': error})

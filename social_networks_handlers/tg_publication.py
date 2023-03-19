@@ -1,5 +1,9 @@
+import requests
 import telegram
+
 from environs import Env
+
+from errors_classes import SocialNetworkError
 
 
 def send_telegram_post(post_text, image_name):
@@ -10,21 +14,41 @@ def send_telegram_post(post_text, image_name):
 
     bot = telegram.Bot(token=telegram_bot_token)
 
-    if image_name is None:
-        post = bot.send_message(telegram_chat_id, post_text)
-    else:
-        with open(image_name, 'rb') as image:
-            if len(post_text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
-                post = bot.send_photo(telegram_chat_id, image, post_text)
-            else:
-                post = []
-                message_with_photo = bot.send_photo(telegram_chat_id, image)
-                message = bot.send_message(telegram_chat_id, post_text)
-                post.append(message_with_photo)
-                post.append(message)
-    if post:
-        return True, post
-    return False, 'post error'
+    try:
+        if image_name is None:
+            message = bot.send_message(telegram_chat_id, post_text)
+            message_id = get_telegram_message_id(message)
+            return message_id
+        else:
+            with open(image_name, 'rb') as image:
+                if post_text is None:
+                    message = bot.send_photo(telegram_chat_id, image)
+                    message_id = get_telegram_message_id(message)
+                    return message_id
+
+                elif len(post_text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
+                    message = bot.send_photo(telegram_chat_id, image, post_text)
+                    message_id = get_telegram_message_id(message)
+                    return message_id
+
+                else:
+                    ids = []
+                    message_id_with_photo = bot.send_photo(telegram_chat_id, image)
+                    message_id = bot.send_message(telegram_chat_id, post_text)
+                    ids.append(get_telegram_message_id(message_id_with_photo))
+                    ids.append(get_telegram_message_id(message_id))
+                    return ids
+
+    except telegram.error.TelegramError:
+        raise SocialNetworkError({'col': 5, 'message': 'inner_tg_error'})
+        # Передается словарь со столбцом чек-листа соцсети и сообщением об ошибке. Тут заглушка, мне было лень
+        # кидать нормальный error
+
+    except requests.exceptions.HTTPError:
+        raise requests.exceptions.HTTPError(col=5)
+
+    except requests.exceptions.ConnectionError:
+        raise requests.exceptions.ConnectionError
 
 
 def delete_telegram_post(message_id):
