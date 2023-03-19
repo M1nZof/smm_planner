@@ -29,14 +29,14 @@ def main():
                 post_text = get_posts_post_text(post)
                 image_file_name = download_posts_image_file_name(post)
                 try:
-                    if post['Telegram'] == 'TRUE' and not post['Telegram_rez']:
+                    if post['Telegram'] == 'TRUE' and not post['Telegram_result']:
                         # TODO в будущем переименовать на нормальное значение ("rez" - типо результат? :/)
                         message_id = send_telegram_post(post_text, image_file_name)
                         put_mark(post['row'], 5, message_id)
-                    if post['VK'] == 'TRUE' and not post['VK_rez']:
+                    if post['VK'] == 'TRUE' and not post['VK_result']:
                         post_id = publication_post_vk(post_text, image_file_name)
                         put_mark(post['row'], 6, post_id)
-                    if post['OK'] == 'TRUE' and not post['OK_rez']:
+                    if post['OK'] == 'TRUE' and not post['OK_result']:
                         post_id = publication_post_ok(post_text, image_file_name)
                         put_mark(post['row'], 7, post_id)
 
