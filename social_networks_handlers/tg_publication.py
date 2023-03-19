@@ -21,10 +21,16 @@ def send_telegram_post(post_text, image_name):
             return message_id
         else:
             with open(image_name, 'rb') as image:
-                if len(post_text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
+                if post_text is None:
+                    message = bot.send_photo(telegram_chat_id, image)
+                    message_id = get_telegram_message_id(message)
+                    return message_id
+
+                elif len(post_text) < 1000:  # Больше ~1000 символов не отправляется с фоткой
                     message = bot.send_photo(telegram_chat_id, image, post_text)
                     message_id = get_telegram_message_id(message)
                     return message_id
+
                 else:
                     ids = []
                     message_id_with_photo = bot.send_photo(telegram_chat_id, image)
