@@ -19,7 +19,7 @@ def get_ok_environs():
     return access_token, application_key, application_secret_key, ok_user, ok_application_id, album
 
 
-def convert_text_to_picture(text):      # Переименовал функцию. Просто звучнее как-то в логике кода смотрится
+def convert_text_to_picture(text):      
     img = Image.new('RGBA', (600, 400), 'white')
     idraw = ImageDraw.Draw(img)
     img.save('post.png')
@@ -49,6 +49,7 @@ def publication_post_ok(post_text, image_file_name):
             # TODO здесь лучше ловить ответ от ОК по аналогии с вк, т.к., например, слишком длинные сообщения не хотят
             #  кидаться, но исключения нет, а только тот же response. Если будет реализовано, то проблема ниже
             #  будет решена
+            #  Она и не будет ловиться. - библиотека всегда возвращает json
             photo_id = response.json()['photos'][0]['photo_id']
             return photo_id
 
@@ -65,4 +66,6 @@ def publication_post_ok(post_text, image_file_name):
     except KeyError:
         # Здесь я не придумал какую лучше ошибку ловить. Можно пробовать поднимать кастомную, если в response
         # есть ['error_msg']. Оставил пока так, чтобы обсудить
+        
+        # Эта ошибка не ловится вообще - ее не бывает, как я не пытался сломать
         raise SocialNetworkError(response.json()['error_msg'])
