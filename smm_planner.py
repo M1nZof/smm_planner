@@ -34,19 +34,22 @@ def main():
                 if post['Telegram'] == 'TRUE' and not post['Telegram_rez']:
                     # TODO в будущем переименовать на нормальное значение ("rez" - типо результат? :/)
                     message_id = send_telegram_post(post_text, image_file_name)
-                    put_mark(cell.row, 5, message_id)
+                    put_mark(post['row'], 5, message_id)
                 if post['VK'] == 'TRUE' and not post['VK_rez']:
                     post_id = publication_post_vk(post_text, image_file_name)
-                    put_mark(cell.row, 6, post_id)
+                    put_mark(post['row'], 6, post_id)
                 if post['OK'] == 'TRUE' and not post['OK_rez']:
                     post_id = publication_post_ok(post_text, image_file_name)
-                    put_mark(cell.row, 7, post_id)
+                    put_mark(post['row'], 7, post_id)
 
             except SocialNetworkError as error:
-                put_mark(cell.row, 5, error)                # TODO check col. Проблема, описанная выше
+                error_dict = error.__dict__['message']
+                put_mark(post['row'], error_dict['col'], error_dict['message'], error=True)
+                                      # Это значение поднимается с ошибкой
 
             except requests.exceptions.HTTPError as error:
-                put_mark(cell.row, 5, error)                # TODO check col. Проблема, описанная выше
+                put_mark(post['row'], 5, error)
+                                    # Здесь такая тема, вроде не прокатит. Попробую позже еще
 
                 # sys.exit(f"Ошибка сети")          # Здесь может быть другая обработка. Я не придумал другой. Просто
                 #                                   # пишу в ячейку, что она есть
@@ -62,10 +65,14 @@ def main():
 # https://stackoverflow.com/questions/65153922/why-am-i-receiving-a-quota-limit-error-google-cloud-platform-compute-engine-vm
 
 
-def put_mark(row, col, post_result):
-    if isinstance(post_result, (str, int, list)):
+def put_mark(row, col, post_result, error=False):
+    if not error:
+        # OLD:
         # Если пришла строка или число, то пост опубликован, иначе это ошибка
         # P.S. Список кидается в случае, если опубликовано 2 поста в телегу (из-за лимита символов)
+
+        # NEW:
+        # Проверка на флаг error. Кидается только в исключениях (см. строка 44)
         sheet_functions.format_cell(row, col, sheet_functions.BLACK, sheet_functions.GREEN)
         sheet_functions.post_cell_text(row, col + 3, f'Опубликовано {str(sheet_functions.get_datetime_now())}'
                                                      f'\n\n{post_result}')
