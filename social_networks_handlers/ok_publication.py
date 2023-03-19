@@ -3,6 +3,7 @@ import requests
 from ok_api import OkApi, Upload, ok_exceptions
 from environs import Env
 from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
 
 from errors_classes import SocialNetworkError
 
@@ -26,7 +27,7 @@ def convert_text_to_picture(text):
     image = Image.open('post.png')
     idraw = ImageDraw.Draw(image)
     black = (240, 8, 12)
-    font = ImageFont.truetype('FreeMono.ttf', size=18)
+    font = ImageFont.truetype(str(Path.joinpath(Path.cwd(), 'social_networks_handlers', 'FreeMono.ttf')), size=18)
     line_number = 30
     for x in range(0, len(text), 50):
         idraw.text((10, line_number), (text[x:x + 50]), fill=black, font=font, color='red')
