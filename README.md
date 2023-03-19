@@ -57,11 +57,23 @@ PIP install -r requirements.txt
   python3 smm_planner
 
 ```
-# Пример работытскрипта
+# Пример работы скрипта
+
 в Гугл таблице
+
 <img width="1277" alt="image" src="https://user-images.githubusercontent.com/55636018/226176171-11bff0a1-7da6-4510-82f9-625f542831bd.png">
+
 В Одноклассниках
+
 <img width="1259" alt="image" src="https://user-images.githubusercontent.com/55636018/226176290-9e0c5f12-e4f0-40b1-9f14-3e60f4f39719.png">
+
+Во ВКонтакте
+
+![image](https://user-images.githubusercontent.com/55636018/226176487-f4ea6d89-8421-4163-8932-0054ed852f1f.png)
+
+В Телеграм
+
+![image](https://user-images.githubusercontent.com/55636018/226176509-0d641d8f-38be-4c84-991f-f8269e22ad19.png)
 
 
 # Отказ от ответственности
