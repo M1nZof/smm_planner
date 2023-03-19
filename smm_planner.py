@@ -79,7 +79,10 @@ def put_mark(row, col, post_result, error=False):
 
 def download_posts_image_file_name(image_url):
     try:
-        image_file_name = f'image_file{Path(parse.urlsplit(image_url).path).suffix}'
+        if Path(parse.urlsplit(image_url).path).suffix:
+            image_file_name = f'image_file{Path(parse.urlsplit(image_url).path).suffix}'
+        else:
+            image_file_name = f'image_file.png' # иначе слишком длинное название файла
         post_image = requests.get(image_url)
         post_image.raise_for_status()
 
