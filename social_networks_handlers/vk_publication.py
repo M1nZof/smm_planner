@@ -48,7 +48,7 @@ def save_photo_to_wall(vk_access, vk_group_id, upload_url, file_path, post_file_
     return photo_owner_id, photo_id
 
 
-def post_wall_photo(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
+def post_on_wall(vk_access, vk_group_id, post_alt, photo_owner_id, photo_id):
     url = 'https://api.vk.com/method/wall.post'
     try:
         payload = {
@@ -107,9 +107,13 @@ def publication_post_vk(post_text, image_file_name):
     Path(file_path).mkdir(parents=True, exist_ok=True)
     try:
         album_id, upload_url = get_photos_wall_upload_server(vk_authorization, vk_group_id)
-        photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
-                                                      file_path, image_file_name)
-        post_id = post_wall_photo(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
+        photo_owner_id, photo_id = None, None
+        if image_file_name:
+            photo_owner_id, photo_id = save_photo_to_wall(vk_authorization, vk_group_id, upload_url,
+                                                          file_path, image_file_name)
+        if not post_text:
+            post_text = ' '
+        post_id = post_on_wall(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
         return post_id
 
     except requests.exceptions.HTTPError as error:
