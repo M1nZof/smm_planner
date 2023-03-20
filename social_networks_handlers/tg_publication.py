@@ -41,8 +41,6 @@ def send_telegram_post(post_text, image_name):
 
     except telegram.error.TelegramError as error:
         raise SocialNetworkError({'col': 5, 'message': error})
-        # Передается словарь со столбцом чек-листа соцсети и сообщением об ошибке. Тут заглушка, мне было лень
-        # кидать нормальный error
 
     except requests.exceptions.HTTPError:
         raise SocialNetworkError({'col': 5, 'message': 'HTTPError'})
