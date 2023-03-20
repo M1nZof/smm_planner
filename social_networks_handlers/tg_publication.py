@@ -39,13 +39,13 @@ def send_telegram_post(post_text, image_name):
                     ids.append(get_telegram_message_id(message_id))
                     return ids
 
-    except telegram.error.TelegramError:
-        raise SocialNetworkError({'col': 5, 'message': 'inner_tg_error'})
+    except telegram.error.TelegramError as error:
+        raise SocialNetworkError({'col': 5, 'message': error})
         # Передается словарь со столбцом чек-листа соцсети и сообщением об ошибке. Тут заглушка, мне было лень
         # кидать нормальный error
 
     except requests.exceptions.HTTPError:
-        raise requests.exceptions.HTTPError(col=5)
+        raise SocialNetworkError({'col': 5, 'message': 'HTTPError'})
 
     except requests.exceptions.ConnectionError:
         raise requests.exceptions.ConnectionError

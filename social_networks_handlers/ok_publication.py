@@ -58,11 +58,10 @@ def publication_post_ok(post_text, image_file_name):
             return photo_id
 
     except ok_exceptions.OkApiException as error:
-        # Странно, но иногда кидаются исключения, а иногда возвращается response как будто все ОК
-        raise SocialNetworkError(error.__dict__['message']['error_msg'])
+        raise SocialNetworkError({'col': 7, 'message': error.__dict__['message']['error_msg']})
 
     except requests.exceptions.HTTPError:
-        raise requests.exceptions.HTTPError
+        raise SocialNetworkError({'col': 7, 'message': 'HTTPError'})
 
     except requests.exceptions.ConnectionError:
         raise requests.exceptions.ConnectionError

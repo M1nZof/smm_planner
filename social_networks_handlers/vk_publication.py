@@ -116,11 +116,11 @@ def publication_post_vk(post_text, image_file_name):
         post_id = post_on_wall(vk_authorization, vk_group_id, post_text, photo_owner_id, photo_id)
         return post_id
 
-    except requests.exceptions.HTTPError as error:
-        raise requests.exceptions.HTTPError(error)
+    except SocialNetworkError as error:
+        raise SocialNetworkError({'col': 6, 'message': error})
+
+    except requests.exceptions.HTTPError:
+        raise SocialNetworkError({'col': 6, 'message': 'HTTPError'})
 
     except requests.exceptions.ConnectionError as error:
         raise requests.exceptions.ConnectionError(error)
-
-    except SocialNetworkError as error:
-        raise SocialNetworkError({'col': 6, 'message': error})
