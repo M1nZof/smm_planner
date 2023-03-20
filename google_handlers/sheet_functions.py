@@ -1,4 +1,5 @@
 import gspread
+import pytz
 
 from gspread import utils
 from pathlib import Path
@@ -44,7 +45,7 @@ def get_formatted_datetime(post_date, post_time):
 
 
 def get_datetime_now():
-    datetime_now = datetime.now()
+    datetime_now = datetime.now(tz=pytz.timezone('Europe/Moscow'))
     return datetime(datetime_now.year, datetime_now.month, datetime_now.day, datetime_now.hour,
                     datetime_now.minute)
 
