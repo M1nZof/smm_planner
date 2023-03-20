@@ -41,9 +41,9 @@ def main():
                         put_mark(post['row'], 7, post_id)
 
                     if post_text:
-                        Path(Path.cwd(), 'temp_post_file').unlink()  # удаляем этот временный файл с html поста
+                        Path(Path.cwd(), 'temp_post_file').unlink()
                     if image_file_name:
-                        Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()  # удаляем файл изображения
+                        Path(Path.joinpath(Path.cwd(), image_file_name)).unlink()
 
                 except SocialNetworkError as error:
                     error_dict = error.__dict__['message']
