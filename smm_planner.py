@@ -1,11 +1,14 @@
 import time
 import requests
 
-from urllib import parse
 from pathlib import Path
 
 from errors_classes import SocialNetworkError
-from google_handlers import sheet_functions, google_document_functions
+from google_handlers import sheet_functions
+from google_handlers.google_document_functions import\
+    download_posts_image_file_name, \
+    get_google_document_text_and_image_url
+from google_handlers.sheet_functions import put_mark
 from social_networks_handlers.ok_publication import publication_post_ok
 from social_networks_handlers.tg_publication import send_telegram_post
 from social_networks_handlers.vk_publication import publication_post_vk
@@ -20,7 +23,7 @@ def main():
             for post in all_new_posts:
                 try:
                     post_text, image_url = \
-                        google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
+                        get_google_document_text_and_image_url(post['link_google_document'])
                 except requests.exceptions.MissingSchema:
                     continue
 
@@ -57,31 +60,6 @@ def main():
                     time.sleep(1)
 
             time.sleep(3)
-
-
-def put_mark(row, col, post_result, error=False):
-    if not error:
-        sheet_functions.format_cell(row, col, sheet_functions.BLACK, sheet_functions.GREEN)
-        sheet_functions.post_cell_text(row, col + 3, f'Опубликовано {str(sheet_functions.get_datetime_now())}'
-                                                     f'\n\n{post_result}')
-    else:
-        sheet_functions.format_cell(row, col, sheet_functions.BLACK, sheet_functions.RED)
-        sheet_functions.post_cell_text(row, col + 3, str(post_result))
-
-
-def download_posts_image_file_name(image_url):
-    try:
-        image_file_name = 'image_file.png'
-        post_image = requests.get(image_url)
-        post_image.raise_for_status()
-
-        file_path = Path.cwd()
-        with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
-            file.write(post_image.content)
-        return image_file_name
-
-    except requests.exceptions.MissingSchema:
-        return
 
 
 if __name__ == '__main__':

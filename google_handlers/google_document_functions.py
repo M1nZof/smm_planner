@@ -1,6 +1,8 @@
 import json
+from pathlib import Path
 
 import gdown
+import requests
 from bs4 import BeautifulSoup
 
 
@@ -45,3 +47,17 @@ def get_google_document_image_url(doc_list, scripts):
             return image_url
     # возвращать список картинок после обработки всего цикла
 
+
+def download_posts_image_file_name(image_url):
+    try:
+        image_file_name = 'image_file.png'
+        post_image = requests.get(image_url)
+        post_image.raise_for_status()
+
+        file_path = Path.cwd()
+        with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
+            file.write(post_image.content)
+        return image_file_name
+
+    except requests.exceptions.MissingSchema:
+        return

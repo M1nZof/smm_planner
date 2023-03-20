@@ -100,3 +100,13 @@ def format_cell(row, col, b_color, f_color):
             "foregroundColor": f_color,
         }
     })
+
+
+def put_mark(row, col, post_result, error=False):
+    if not error:
+        format_cell(row, col, BLACK, GREEN)
+        post_cell_text(row, col + 3, f'Опубликовано {str(get_datetime_now())}'
+                                     f'\n\n{post_result}')
+    else:
+        format_cell(row, col, BLACK, RED)
+        post_cell_text(row, col + 3, str(post_result))
