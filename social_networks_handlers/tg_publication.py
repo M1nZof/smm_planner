@@ -3,7 +3,7 @@ import telegram
 
 from environs import Env
 
-from errors_classes import SocialNetworkError
+from error_classes.errors_classes import SocialNetworkError
 
 
 def send_telegram_post(post_text, image_name):

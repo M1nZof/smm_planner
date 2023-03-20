@@ -3,7 +3,7 @@ import requests
 from pathlib import Path
 from environs import Env
 
-from errors_classes import SocialNetworkError
+from error_classes.errors_classes import SocialNetworkError
 
 
 def check_vk_request_error(response):

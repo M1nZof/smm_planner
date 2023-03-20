@@ -5,7 +5,7 @@ from environs import Env
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 
-from errors_classes import SocialNetworkError
+from error_classes.errors_classes import SocialNetworkError
 
 
 def get_ok_environs():

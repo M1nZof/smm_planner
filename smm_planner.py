@@ -3,7 +3,7 @@ import requests
 
 from pathlib import Path
 
-from errors_classes import SocialNetworkError
+from error_classes.errors_classes import SocialNetworkError
 from google_handlers import sheet_functions
 from google_handlers.google_document_functions import\
     download_posts_image_file_name, \
