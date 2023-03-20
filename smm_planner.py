@@ -55,9 +55,12 @@ def main():
                     error_dict = error.__dict__['message']
                     put_mark(post['row'], error_dict['col'], f"Ошибка\n\n{error_dict['message']}", error=True)
 
-                except requests.exceptions.ConnectionError:
-                    print(f'Ошибка соединения сети.\nПопытка восстановления соединения...')
-                    time.sleep(1)
+                except requests.exceptions.ConnectionError as error:
+                    for _ in range(10):
+                        print(error)
+                        # print(f'Ошибка соединения сети.\nПопытка восстановления соединения...')
+                        time.sleep(1)
+                    time.sleep(60)
 
             time.sleep(3)
 
