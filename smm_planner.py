@@ -84,33 +84,10 @@ def download_posts_image_file_name(image_url):
         return
 
 
-# def download_posts_image_file_name(post):
-#     try:
-#         image_file_name = f'image_file{Path(parse.urlsplit(post["photo_url"]).path).suffix}'
-#         post_image = requests.get(post['photo_url'])
-#         post_image.raise_for_status()
-#
-#         file_path = Path.cwd()
-#         with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
-#             file.write(post_image.content)
-#
-#         return image_file_name
-#     except requests.exceptions.MissingSchema:
-#         return
-
-
-def get_posts_post_text(post):
+def get_posts_post_image_url_and_text(post):        # TODO Нужно в другое место будет перенести
     try:
-        post_text = google_document_functions.get_post_text(post['link_google_document'])
-        return post_text
-    except requests.exceptions.MissingSchema:
-        return
-
-
-def get_post_image_url(post):
-    try:
-        image_url = google_document_functions.get_post_image_url(post['link_google_document'])
-        return image_url
+        post_text, image_url = google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
+        return post_text, image_url
     except requests.exceptions.MissingSchema:
         return
 
