@@ -47,18 +47,13 @@ def main():
 
                 except SocialNetworkError as error:
                     error_dict = error.__dict__['message']
-                    put_mark(post['row'], error_dict['col'], error_dict['message'], error=True)
-
-                except requests.exceptions.HTTPError as error:
-                    put_mark(post['row'], 5, error)
-                                        # Здесь такая тема, вроде не прокатит. Попробую позже еще
+                    put_mark(post['row'], error_dict['col'], f"Ошибка\n\n{error_dict['message']}", error=True)
 
                 except requests.exceptions.ConnectionError:
                     print(f'Ошибка соединения сети.\nПопытка восстановления соединения...')
                     time.sleep(1)
 
-            time.sleep(3)  # ограничение запроса к Гуглу, иначе блокирует доступ
-    # https://stackoverflow.com/questions/65153922/why-am-i-receiving-a-quota-limit-error-google-cloud-platform-compute-engine-vm
+            time.sleep(3)
 
 
 def put_mark(row, col, post_result, error=False):
@@ -76,7 +71,7 @@ def download_posts_image_file_name(image_url):
         if Path(parse.urlsplit(image_url).path).suffix:
             image_file_name = f'image_file{Path(parse.urlsplit(image_url).path).suffix}'
         else:
-            image_file_name = f'image_file.png' # иначе слишком длинное название файла
+            image_file_name = f'image_file.png'
         post_image = requests.get(image_url)
         post_image.raise_for_status()
 
