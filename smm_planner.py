@@ -1,4 +1,3 @@
-import sys
 import time
 import requests
 
@@ -86,7 +85,8 @@ def download_posts_image_file_name(image_url):
 
 def get_posts_post_image_url_and_text(post):        # TODO Нужно в другое место будет перенести
     try:
-        post_text, image_url = google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
+        post_text, image_url = \
+            google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
         return post_text, image_url
     except requests.exceptions.MissingSchema:
         return
