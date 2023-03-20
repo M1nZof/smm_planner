@@ -7,6 +7,7 @@ from datetime import datetime
 GOOGLE_CREDENTIALS = gspread.service_account(Path.joinpath(Path.cwd(), 'service_account.json').__str__())
 SPREADSHEET = GOOGLE_CREDENTIALS.open('smm-planer-table')
 WORKSHEET = SPREADSHEET.sheet1
+
 BLACK = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
 WHITE = {'red': 1.0, 'green': 1.0, 'blue': 1.0}
 GREEN = {'red': 0.0, 'green': 1.0, 'blue': 0.0}
@@ -76,16 +77,16 @@ def get_all_records():
     return all_records
 
 
-def get_all_times():
-    for time in sorted(WORKSHEET.col_values(4)):
-        if '-' not in time:
-            continue
-        time_, time_chr = format_time(time)
-        print(time_, time_chr)
-
-
-def get_posts_count():
-    return len(WORKSHEET.col_values(1)) - 1
+# def get_all_times():
+#     for time in sorted(WORKSHEET.col_values(4)):
+#         if '-' not in time:
+#             continue
+#         time_, time_chr = format_time(time)
+#         print(time_, time_chr)
+#
+#
+# def get_posts_count():
+#     return len(WORKSHEET.col_values(1)) - 1
 
 
 def post_cell_text(row, col, text=''):

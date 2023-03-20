@@ -6,8 +6,8 @@ from pathlib import Path
 from error_classes.errors_classes import SocialNetworkError
 from google_handlers import sheet_functions
 from google_handlers.google_document_functions import\
-    download_posts_image_file_name, \
-    get_google_document_text_and_image_url
+    download_posts_image, \
+    download_google_document_text_and_image_url
 from google_handlers.sheet_functions import put_mark
 from social_networks_handlers.ok_publication import publication_post_ok
 from social_networks_handlers.tg_publication import send_telegram_post
@@ -23,12 +23,12 @@ def main():
             for post in all_new_posts:
                 try:
                     post_text, image_url = \
-                        get_google_document_text_and_image_url(post['link_google_document'])
+                        download_google_document_text_and_image_url(post['link_google_document'])
                 except requests.exceptions.MissingSchema:
                     continue
 
                 if image_url:
-                    image_file_name = download_posts_image_file_name(image_url)
+                    image_file_name = download_posts_image(image_url)
                 else:
                     image_file_name = None
 

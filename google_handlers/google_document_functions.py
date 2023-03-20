@@ -6,14 +6,14 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_google_document_text_and_image_url(link_google_document):
+def download_google_document_text_and_image_url(link_google_document):
     document_name = 'temp_post_file'
     gdown.download(url=link_google_document, output=document_name, fuzzy=True, quiet=True)
-    text_with_photo = get_doc_text_and_image_url(document_name)
+    text_with_photo = get_document_text_and_image_url(document_name)
     return text_with_photo
 
 
-def get_doc_text_and_image_url(document):
+def get_document_text_and_image_url(document):
     with open(document, 'r', encoding='UTF-8') as file:
         soup = BeautifulSoup(file, 'html.parser')
         scripts = soup.find_all({'script': 'nonce'})
@@ -48,7 +48,7 @@ def get_google_document_image_url(doc_list, scripts):
     # возвращать список картинок после обработки всего цикла
 
 
-def download_posts_image_file_name(image_url):
+def download_posts_image(image_url):
     try:
         image_file_name = 'image_file.png'
         post_image = requests.get(image_url)
