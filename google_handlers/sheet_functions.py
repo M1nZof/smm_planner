@@ -53,20 +53,20 @@ def get_all_new_posts():
     all_new_posts = []
     datetime_now = get_datetime_now()
     for num, post in enumerate(all_posts, start=2):
-        if post['link_google_document'] == '' and post['photo_url'] == '':
+        if post['link_google_document'] == '':
             continue
         post['row'] = num
         formatted_datetime = get_formatted_datetime(post['date'], post['time'])
-        if (post['link_google_document'] or post['photo_url']) and formatted_datetime <= datetime_now \
+        if formatted_datetime <= datetime_now \
                 and (
                 (post['Telegram'] == 'TRUE' and
-                 post['Telegram_result'] == '' or post['Telegram_result'].startswith('Ошибка'))
+                 (post['Telegram_result'] == '' or post['Telegram_result'].startswith('Ошибка')))
 
                 or (post['VK'] == 'TRUE' and
-                    post['VK_result'] == '' or post['VK_result'].startswith('Ошибка'))
+                    (post['VK_result'] == '' or post['VK_result'].startswith('Ошибка')))
 
                 or (post['OK'] == 'TRUE' and
-                    post['OK_result'] == '' or post['OK_result'].startswith('Ошибка'))
+                    (post['OK_result'] == '' or post['OK_result'].startswith('Ошибка')))
         ):
             all_new_posts.append(post)
 
