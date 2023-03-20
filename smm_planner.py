@@ -21,6 +21,7 @@ def main():
             time.sleep(60)
         else:
             for post in all_new_posts:
+                print(post)
                 try:
                     post_text, image_url = \
                         download_google_document_text_and_image_url(post['link_google_document'])
