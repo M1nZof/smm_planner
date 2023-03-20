@@ -1,4 +1,4 @@
-class SocialNetworkError(Exception):    # TODO кинул сюда, потому что не придумал, куда еще. Открыто для дискуссии
+class SocialNetworkError(Exception):
     def __init__(self, *args):
         if args:
             self.message = args[0]
