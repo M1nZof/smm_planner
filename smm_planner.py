@@ -18,7 +18,11 @@ def main():
             time.sleep(60)
         else:
             for post in all_new_posts:
-                post_text, image_url = get_posts_post_image_url_and_text(post)
+                try:
+                    post_text, image_url = \
+                        google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
+                except requests.exceptions.MissingSchema:
+                    continue
 
                 if image_url:
                     image_file_name = download_posts_image_file_name(image_url)
@@ -79,15 +83,6 @@ def download_posts_image_file_name(image_url):
             file.write(post_image.content)
 
         return image_file_name
-    except requests.exceptions.MissingSchema:
-        return
-
-
-def get_posts_post_image_url_and_text(post):        # TODO Нужно в другое место будет перенести
-    try:
-        post_text, image_url = \
-            google_document_functions.get_google_document_text_and_image_url(post['link_google_document'])
-        return post_text, image_url
     except requests.exceptions.MissingSchema:
         return
 
