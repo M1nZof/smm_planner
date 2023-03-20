@@ -71,18 +71,15 @@ def put_mark(row, col, post_result, error=False):
 
 def download_posts_image_file_name(image_url):
     try:
-        if Path(parse.urlsplit(image_url).path).suffix:
-            image_file_name = f'image_file{Path(parse.urlsplit(image_url).path).suffix}'
-        else:
-            image_file_name = f'image_file.png'
+        image_file_name = 'image_file.png'
         post_image = requests.get(image_url)
         post_image.raise_for_status()
 
         file_path = Path.cwd()
         with open(Path.joinpath(file_path, image_file_name), 'wb') as file:
             file.write(post_image.content)
-
         return image_file_name
+
     except requests.exceptions.MissingSchema:
         return
 
