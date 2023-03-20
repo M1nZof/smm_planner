@@ -15,24 +15,16 @@ from social_networks_handlers.vk_publication import publication_post_vk
 def main():
     while True:
         all_new_posts = sheet_functions.get_all_new_posts()
-        # datetime_now = sheet_functions.get_datetime_now()
         if len(all_new_posts) == 0:
             time.sleep(60)
         else:
             for post in all_new_posts:
-                # formatted_datetime = sheet_functions.get_formatted_datetime(post['date'], post['time'])
-                # if not formatted_datetime <= datetime_now:
-                #     break
+                post_text, image_url = get_posts_post_image_url_and_text(post)
 
-                # Избыточные проверки (обрабатываются в get_all_new_posts
-
-                post_text = get_posts_post_text(post)
-                image_file_name = None
-                try:
-                    image_file_name = download_posts_image_file_name(get_post_image_url(post))
-                except Exception:
-                    pass
-                # image_file_name = download_posts_image_file_name(post)
+                if image_url:
+                    image_file_name = download_posts_image_file_name(image_url)
+                else:
+                    image_file_name = None
 
                 try:
                     if post['Telegram'] == 'TRUE' and not post['Telegram_result']:
