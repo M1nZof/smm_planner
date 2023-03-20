@@ -73,5 +73,6 @@ def publication_post_ok(post_text, image_file_name):
     except requests.exceptions.HTTPError:
         raise SocialNetworkError({'col': 7, 'message': 'HTTPError'})
 
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as error:
+        print(error)
         raise requests.exceptions.ConnectionError
