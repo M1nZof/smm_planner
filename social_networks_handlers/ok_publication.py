@@ -37,6 +37,7 @@ def convert_text_to_picture(text):
 
 def publication_post_ok(post_text, image_file_name):
     access_token, application_key, application_secret_key, ok_user, ok_application_id, album = get_ok_environs()
+    post_text = post_text[:255]
     if not image_file_name:
         convert_text_to_picture(post_text)
         image_file_name = 'post.png'
@@ -44,31 +45,18 @@ def publication_post_ok(post_text, image_file_name):
                application_key=application_key,
                application_secret_key=application_secret_key)
     upload = Upload(ok)
-
     try:
         upload_response = upload.photo(photos=[image_file_name], album=album)
         for photo_id in upload_response['photos']:
             token = upload_response['photos'][photo_id]['token']
             response = ok.photosV2.commit(photo_id=photo_id, token=token, comment=post_text)
-            # TODO здесь лучше ловить ответ от ОК по аналогии с вк, т.к., например, слишком длинные сообщения не хотят
-            #  кидаться, но исключения нет, а только тот же response. Если будет реализовано, то проблема ниже
-            #  будет решена
-            #  Она и не будет ловиться. - библиотека всегда возвращает json
             photo_id = response.json()['photos'][0]['photo_id']
             return photo_id
-
     except ok_exceptions.OkApiException as error:
         raise SocialNetworkError({'col': 7, 'message': error.__dict__['message']['error_msg']})
-
     except requests.exceptions.HTTPError:
         raise SocialNetworkError({'col': 7, 'message': 'HTTPError'})
-
     except requests.exceptions.ConnectionError:
         raise requests.exceptions.ConnectionError
-
     except KeyError:
-        # Здесь я не придумал какую лучше ошибку ловить. Можно пробовать поднимать кастомную, если в response
-        # есть ['error_msg']. Оставил пока так, чтобы обсудить
-        
-        # Эта ошибка не ловится вообще - ее не бывает, как я не пытался сломать
         raise SocialNetworkError({'col': 7, 'message': response.json()['error_msg']})
