@@ -60,7 +60,7 @@ def main():
                     for _ in range(10):
                         print(f'Ошибка соединения сети.\nПопытка восстановления соединения...')
                         time.sleep(1)
-                    time.sleep(60)
+                    continue
 
             time.sleep(3)
 
