@@ -57,17 +57,15 @@ def get_all_new_posts():
             continue
         post['row'] = num
         formatted_datetime = get_formatted_datetime(post['date'], post['time'])
-        if formatted_datetime <= datetime_now \
-                and (
-                (post['Telegram'] == 'TRUE' and
-                 (post['Telegram_result'] == '' or post['Telegram_result'].startswith('Ошибка')))
+        if (formatted_datetime <= datetime_now
+                and ((post['Telegram'] == 'TRUE' and
+                      (not post['Telegram_result'] or post['Telegram_result'].startswith('Ошибка')))
 
-                or (post['VK'] == 'TRUE' and
-                    (post['VK_result'] == '' or post['VK_result'].startswith('Ошибка')))
+                     or (post['VK'] == 'TRUE' and
+                         (not post['VK_result'] or post['VK_result'].startswith('Ошибка')))
 
-                or (post['OK'] == 'TRUE' and
-                    (post['OK_result'] == '' or post['OK_result'].startswith('Ошибка')))
-        ):
+                     or (post['OK'] == 'TRUE' and
+                         (not post['OK_result'] or post['OK_result'].startswith('Ошибка'))))):
             all_new_posts.append(post)
 
     return all_new_posts
