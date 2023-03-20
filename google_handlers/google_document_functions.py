@@ -33,12 +33,15 @@ def get_google_document_image_url(doc_list, scripts):
     except KeyError:
         return
     for script in scripts:
+        # если здесь добавить пустой список
         if script.text.find(script_doc_id) > 0:
             start_script_doc_id_char = script.text.find(script_doc_id)
             start_script_doc_id = script.text[start_script_doc_id_char:]
             start_image_url_char = start_script_doc_id.find('https')
             start_image_url = start_script_doc_id[start_image_url_char:]
-            excess_image_url_char = start_image_url.find('"}')
+            excess_image_url_char = start_image_url.find('"')
             image_url = start_image_url[:excess_image_url_char]
+            # здесь добавлять image_url в список картинок
             return image_url
+    # возвращать список картинок после обработки всего цикла
 
